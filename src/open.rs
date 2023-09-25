@@ -1,3 +1,4 @@
+
 use std::{fs::File, path::Path, io::BufReader};
 
 pub fn csv_read(path: &str) -> Vec<csv::ByteRecord>{
@@ -6,7 +7,7 @@ pub fn csv_read(path: &str) -> Vec<csv::ByteRecord>{
         Err(e) => panic!("\u{1b}[31m{:?}\u{1b}[39m", e),
     };
     let reader = BufReader::new(file_handle);
-    let mut data = Vec::new();
+    let mut data: Vec<csv::ByteRecord> = Vec::new();
     // Build the CSV reader and iterate over each record.
     let mut rdr = csv::ReaderBuilder::new()
         .has_headers(false)
@@ -22,13 +23,12 @@ pub fn csv_read(path: &str) -> Vec<csv::ByteRecord>{
 }
 
 pub fn csv_transform(data: Vec<csv::ByteRecord>) {
-    // println!("{:?}", data);
-
     for y in 0..data.len() {
         for (x, bytes) in data[y].iter().enumerate() {
             match bytes {
                 [] => println!("EMPTY: {:?}", bytes),
                 _ => {
+                    // print!("{:?}", bytes);
                     let t = String::from_utf8_lossy(&bytes);
                     let s = t.replace(|c: char| !c.is_ascii(), "");
                     // checks if unsigned-integer
@@ -142,26 +142,3 @@ pub fn csv_transform(data: Vec<csv::ByteRecord>) {
         };
     }
 }
-
-// fn is_byte_string(byte: &[u8]) -> bool {
-//     let t = String::from_utf8_lossy(byte);
-//     let s = t.replace(|c: char| !c.is_ascii(), "");
-//     match s.chars().all(char::is_numeric) {
-//         true => return false,
-//         false => {
-//             let trimmed = s.trim()
-//                 .replace("$", "")
-//                 .replace("%", "")
-//                 .replace(",", "")
-//                 .replace(".", "")
-//                 .replace("-", "")
-//                 .replace("/", "")
-//                 .replace(":", "");
-//             // checks if trimmed value is a number
-//             match trimmed.chars().all(char::is_numeric) {
-//                 true => return false,
-//                 false => return true,
-//             }
-//         },
-//     }
-// }
