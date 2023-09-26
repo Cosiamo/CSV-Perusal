@@ -1,4 +1,5 @@
-use crate::{utils::{csv_read, ByteString}, csvtype::{CSVType, CSVTypeError}};
+use crate::{utils::ByteString, csvtype::{CSVType, CSVTypeError}};
+use std::{fs::File, path::Path, io::BufReader};
 
 pub fn open_csv(path: &str) -> Vec<CSVType> {
     let mut datatype: Vec<CSVType> = Vec::new();
@@ -39,6 +40,27 @@ pub fn open_csv(path: &str) -> Vec<CSVType> {
     };
 
     return datatype;
+}
+
+fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
+    let file_handle = match File::open(Path::new(&path)) {
+        Ok(val) => val,
+        Err(e) => panic!("\u{1b}[31m{:?}\u{1b}[39m", e),
+    };
+    let reader = BufReader::new(file_handle);
+    let mut data: Vec<csv::ByteRecord> = Vec::new();
+    // Build the CSV reader and iterate over each record.
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(false)
+        .from_reader(reader);
+    for result in rdr.byte_records() {
+        match result {
+            Ok(record) => data.push(record),
+            Err(e) => return Err(e),
+        };
+    }
+    
+    return Ok(data);
 }
 
 fn match_catch(s: String) -> CSVType {
