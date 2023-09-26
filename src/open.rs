@@ -1,144 +1,113 @@
+use crate::{utils::{csv_read, ByteString}, csvtype::{CSVType, CSVTypeError}};
 
-use std::{fs::File, path::Path, io::BufReader};
+pub fn open_csv(path: &str) -> Vec<CSVType> {
+    let mut datatype: Vec<CSVType> = Vec::new();
 
-pub fn csv_read(path: &str) -> Vec<csv::ByteRecord>{
-    let file_handle = match File::open(Path::new(&path)) {
-        Ok(val) => val,
-        Err(e) => panic!("\u{1b}[31m{:?}\u{1b}[39m", e),
-    };
-    let reader = BufReader::new(file_handle);
-    let mut data: Vec<csv::ByteRecord> = Vec::new();
-    // Build the CSV reader and iterate over each record.
-    let mut rdr = csv::ReaderBuilder::new()
-        .has_headers(false)
-        .from_reader(reader);
-    for result in rdr.byte_records() {
-        match result {
-            Ok(record) => data.push(record),
-            Err(e) => panic!("\u{1b}[31m{:?}\u{1b}[39m", e),
-        };
-    }
-    
-    return data;
-}
-
-pub fn csv_transform(data: Vec<csv::ByteRecord>) {
-    for y in 0..data.len() {
-        for (x, bytes) in data[y].iter().enumerate() {
-            match bytes {
-                [] => println!("EMPTY: {:?}", bytes),
-                _ => {
-                    // print!("{:?}", bytes);
-                    let t = String::from_utf8_lossy(&bytes);
-                    let s = t.replace(|c: char| !c.is_ascii(), "");
-                    // checks if unsigned-integer
-                    match s.chars().all(char::is_numeric) {
-                        true => match s.parse::<u64>() {
-                            // matches appropriate bit size
-                            Ok(v) => match v {
-                                v if v <= std::u8::MAX.into() => 
-                                println!("U8: {:?}", v),
-                                v if v <= std::u16::MAX.into() => 
-                                println!("U16: {:?}", v),
-                                v if v <= std::u32::MAX.into() => 
-                                println!("U32: {:?}", v),
-                                _ => 
-                                println!("U64: {:?}", v),
-                            },
-                            Err(e) => 
-                            panic!("\n\u{1b}[31m{:?} \n \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", 
-                                e, y, x
-                            ),
-                        },
-                        false => {
-                            let trimmed = s.trim()
-                                .replace("$", "")
-                                .replace("%", "")
-                                .replace(",", "")
-                                .replace(".", "")
-                                .replace("-", "")
-                                .replace("/", "")
-                                .replace(":", "");
-                            // checks if trimmed value is a number
-                            match trimmed.chars().all(char::is_numeric) {
-                                true => match s {
-                                    // checks if positive Float
-                                    s if s.chars().map(|x| x).collect::<Vec<char>>()
-                                    .contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) =>
-                                    match s.parse::<f64>() {
-                                        Ok(v) => match v {
-                                            v if v <= std::f32::MAX.into() => 
-                                            println!("F32: {:?}", v),
-                                            _ => 
-                                            println!("F64: {:?}", v),
-                                        },
-                                        Err(e) => 
-                                        panic!("\n\u{1b}[31m{:?} \n \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", 
-                                            e, y, x
-                                        ),
-                                    },
-                                    // checks if negative Float
-                                    s if s.chars().map(|x| x).collect::<Vec<char>>()
-                                    .contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0])
-                                    && s.chars().map(|x| x).collect::<Vec<_>>()[0] 
-                                    == "-".chars().map(|x| x).collect::<Vec<_>>()[0] => 
-                                    match s.parse::<f64>() {
-                                        Ok(v) => match v {
-                                            v if (v * -1.0) >= std::f32::MIN.into() => 
-                                            println!("F32: {:?}", v),
-                                            _ => 
-                                            println!("F64: {:?}", v),
-                                        }
-                                        Err(e) => 
-                                        panic!("\n\u{1b}[31m{:?} \n \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", 
-                                            e, y, x
-                                        ),
-                                    },
-                                    // checks if negative integer 
-                                    s if s.chars().map(|x| x).collect::<Vec<char>>()[0] 
-                                    == "-".chars().map(|x| x).collect::<Vec<char>>()[0] => 
-                                    match trimmed.parse::<i64>() {
-                                        Ok(v) => match v {
-                                            v if (v * -1) >= std::i8::MIN.into() => 
-                                            println!("i8: {:?}", v),
-                                            v if (v * -1) >= std::i16::MIN.into() => 
-                                            println!("i16: {:?}", v),
-                                            v if (v * -1) >= std::i32::MIN.into() => 
-                                            println!("i32: {:?}", v),
-                                            _ => 
-                                            println!("i64: {:?}", v),
-                                        },
-                                        Err(e) => 
-                                        panic!("\n\u{1b}[31m{:?} \n \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", 
-                                            e, y, x
-                                        ),
-                                    },
-                                    // catches unsigned integers
-                                    _ => match trimmed.parse::<u64>() {
-                                        Ok(v) => {
-                                            // println!("U64:{:?}, BYTES:{:?} \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", trimmed, bytes, (num + y) + 1, x + 1);
-                                            match v {
-                                                v if v <= std::u8::MAX.into() => 
-                                                println!("U8: {:?}", v),
-                                                v if v <= std::u16::MAX.into() => 
-                                                println!("U16: {:?}", v),
-                                                v if v <= std::u32::MAX.into() => 
-                                                println!("U32: {:?}", v),
-                                                _ => 
-                                                println!("U64: {:?}", v),
-                                        }},
-                                        Err(e) => 
-                                                panic!("\n\u{1b}[31m{:?} \n \u{1b}[30;103mRow:{:?} Col:{:?}\u{1b}[0m\n", 
-                                                    e, y, x
-                                                ),
+    match csv_read(path) {
+        Ok(data) => {
+            for y in 0..data.len() {
+                for (_x, bytes) in data[y].iter().enumerate() {
+                    match bytes {
+                        [] => datatype.push(CSVType::Empty), 
+                        _ => {
+                            match String::from_utf8((&bytes).to_vec()) {
+                                Ok(s) => match s.parse::<i64>() {
+                                    Ok(v) => datatype.push(CSVType::Int(v)),
+                                    Err(_) => match s.parse::<f64>() {
+                                        Ok(v) => datatype.push(CSVType::Float(v)),
+                                        Err(_) => datatype.push(match_catch(s))
                                     },
                                 },
-                                false => println!("CATCH: {:?}", trimmed),
+                                Err(_) => {
+                                    let t = String::from_utf8_lossy(&bytes);
+                                    let s = t.replace(|c: char| !c.is_ascii(), "");
+                                    match s.parse::<i64>() {
+                                        Ok(v) => datatype.push(CSVType::Int(v)),
+                                        Err(_) => match s.parse::<f64>() {
+                                            Ok(v) => datatype.push(CSVType::Float(v)),
+                                            Err(_) => datatype.push(match_catch(s))
+                                        },
+                                    }
+                                },
                             }
-                        },
+                        }
                     }
-                },
+                }
             }
-        };
+        },
+        Err(e) => datatype.push(CSVType::Error(CSVTypeError::ByteError(e))),
+    };
+
+    return datatype;
+}
+
+fn match_catch(s: String) -> CSVType {
+    let new_str = ByteString {s};
+    match new_str.trimmed().len() {
+        // checks for "\u{1680}" (Ogham Space Mark) 
+        0 => return CSVType::String(new_str.s),
+        _ => match new_str.trimmed().chars().all(char::is_numeric) {
+            true => match new_str {
+                // checks for positive percent
+                bs if bs.is_percent_pos()
+                => match bs.trimmed().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v / 100.0),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+                // checks for negative percent
+                bs if bs.is_percent_neg()
+                => match bs.trimmed().parse::<f64>() {
+                    Ok(v) => return CSVType::Float((v * -1.0) / 100.0),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+                // checks for date
+                bs if bs.is_date() => return bs.date_match(),
+                // checks for positive currency 
+                bs if bs.is_currency_pos()
+                => match bs.trimmed().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v / 100.0),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+                // checks for negative currency
+                bs if bs.is_currency_neg()
+                => match bs.trimmed().parse::<f64>() {
+                    Ok(v) => return CSVType::Float((v * -1.0) / 100.0),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+                // checks if negative integer 
+                bs if bs.is_int_neg() 
+                => match bs.trimmed().parse::<i64>() {
+                    Ok(v) => return CSVType::Int(v * -1),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+                // catches positive integers
+                _ => match new_str.s.parse::<i64>() {
+                    Ok(v) => return CSVType::Int(v),
+                    Err(_) => match new_str.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+                    },
+                },
+            },
+            false => match new_str.s.parse::<String>() {
+                Ok(s) => return CSVType::String(s),
+                Err(e) => return CSVType::Error(CSVTypeError::Parse(e)),
+            },
+        },
     }
 }

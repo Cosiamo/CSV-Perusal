@@ -1,23 +1,22 @@
 extern crate csv_reader;
-use csv_reader::open::csv_read;
-use csv_reader::csvtype::{CSVType, match_type};
-use csv::ByteRecord;
+// use csv::ByteRecord;
+use csv_reader::{open::open_csv, csvtype::CSVType};
 
 fn main() {
-    let path = "test_data/Employee_Sample_Data_Limited.csv";
+    let _path = "test_data/Employee_Sample_Data_Limited.csv";
     let _path = "test_data/MOCK_DATA.csv";
+    let path = "test_data/DATA10ROWS.csv";
 
-    let val: Vec<ByteRecord> = csv_read(path);
-
-    let temp = match_type(val);
-    for v in temp.iter() {
+    let temp = open_csv(path);
+    for (_x, v) in temp.iter().enumerate() {
         match v {
-            CSVType::Int(i) => println!("INT: {:?}", i),
-            CSVType::Float(i) => println!("FLOAT: {:?}", i),
-            CSVType::String(i) => println!("STRING: {:?}", i),
-            CSVType::Date(i) => println!("DATE: {:?}", i),
-            CSVType::Error(_) => println!("++++++++++++++ERROR++++++++++++++"),
-            CSVType::None(i) => println!("NONE: {:?}", i),
+            CSVType::Int(i) => print!("INT: {:?}, ", i),
+            CSVType::Float(i) => print!("FLOAT: {:?}, ", i),
+            CSVType::String(i) => print!("STRING: {:?}, ", i),
+            CSVType::Date(i) => print!("DATE: {:?}, ", i),
+            CSVType::Error(e) => panic!("++++++++++++++ERROR++++++++++++++ {:?}", e),
+            CSVType::Empty => print!("NONE, "),
         }
+        print!("\n");
     }
 }
