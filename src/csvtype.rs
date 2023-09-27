@@ -3,12 +3,11 @@ pub enum CSVType {
     Float(f64),
     String(String),
     Date(String),
-    Error(CSVTypeError),
+    Time(String),
+    DateTime(String),
+    Error(std::convert::Infallible),
     Empty,
 }
-
-#[derive(Debug)]
-pub enum CSVTypeError {
-    Parse(std::convert::Infallible),
-    ByteError(csv::Error),
+pub struct ByteString {
+    pub(crate) s: String,
 }
