@@ -43,24 +43,24 @@ pub fn open_csv(path: &str) -> Result<Vec<CSVType>, csv::Error> {
 }
 
 fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
-    let file_handle = match File::open(Path::new(&path)) {
-        Ok(val) => val,
-        Err(e) => panic!("\u{1b}[31m{:?}\u{1b}[39m", e),
+    match File::open(Path::new(&path)) {
+        Ok(file_handle) => {
+            let reader = BufReader::new(file_handle);
+            let mut data: Vec<csv::ByteRecord> = Vec::new();
+            // Build the CSV reader and iterate over each record.
+            let mut rdr = csv::ReaderBuilder::new()
+                .has_headers(false)
+                .from_reader(reader);
+            for result in rdr.byte_records() {
+                match result {
+                    Ok(record) => data.push(record),
+                    Err(e) => return Err(e),
+                };
+            }
+            return Ok(data)
+        },
+        Err(e) => return Err(e.into()),
     };
-    let reader = BufReader::new(file_handle);
-    let mut data: Vec<csv::ByteRecord> = Vec::new();
-    // Build the CSV reader and iterate over each record.
-    let mut rdr = csv::ReaderBuilder::new()
-        .has_headers(false)
-        .from_reader(reader);
-    for result in rdr.byte_records() {
-        match result {
-            Ok(record) => data.push(record),
-            Err(e) => return Err(e),
-        };
-    }
-    
-    Ok(data)
 }
 
 fn match_catch(s: String) -> CSVType {
@@ -73,6 +73,10 @@ fn match_catch(s: String) -> CSVType {
         },
         _ => match bytestring.trimmed().chars().all(char::is_numeric) {
             true => match bytestring {
+                // checks for time
+                bs if bs.is_time() => return bs.time_match(),
+                // checks for date
+                bs if bs.is_date() => return bs.date_match(),
                 // checks for positive percent
                 bs if bs.is_percent_pos()
                 => match bs.trimmed().parse::<f64>() {
@@ -91,12 +95,6 @@ fn match_catch(s: String) -> CSVType {
                         Err(e) => return CSVType::Error(e),
                     },
                 },
-                // checks for date
-                bs if bs.is_date() => return bs.date_match(),
-                // checks for time
-                bs if bs.is_time() => return bs.time_match(),
-                // checks for datetime
-                bs if bs.is_datetime() => return bs.date_match(),
                 // checks for positive currency 
                 bs if bs.is_currency_pos()
                 => match bs.trimmed().parse::<f64>() {
@@ -115,35 +113,27 @@ fn match_catch(s: String) -> CSVType {
                         Err(e) => return CSVType::Error(e),
                     },
                 },
-                // checks if negative integer 
-                bs if bs.is_int_neg() 
-                => match bs.trimmed().parse::<i64>() {
-                    Ok(v) => return CSVType::Int(v * -1),
-                    Err(_) => match bs.s.parse::<String>() {
-                        Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
-                    },
-                },
                 // catch
                 _ => match bytestring.s.parse::<i64>() {
                     Ok(v) => return CSVType::Int(v),
                     Err(_) => match bytestring.s.parse::<f64>() {
                         Ok(v) => return CSVType::Float(v),
                         Err(_) => match bytestring.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
+                            Ok(s) => {return CSVType::String(s)},
                             Err(e) => return CSVType::Error(e),
                         },
                     }
                 },
             },
-            false => match bytestring {
-                bs if bs.is_time_12_h() => return bs.time_match(),
-                bs if bs.is_datetime() => return bs.date_match(),
+            false => {
+                match bytestring {
+                bs if bs.is_datetime() => return bs.datetime_match(),
+                bs if bs.is_time_12h() => return bs.time_match(),
                 _ => match bytestring.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
                     Err(e) => return CSVType::Error(e),
                 },
-            }
+            }}
         },
     }
 }

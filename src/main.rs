@@ -6,6 +6,7 @@ fn main() {
     let _path = "test_data/Employee_Sample_Data_Limited.csv";
     let _path = "test_data/MOCK_DATA.csv";
     let path = "test_data/DATA10ROWS.csv";
+    let _path = "test_data/temp.csv";
 
     let temp = match open_csv(path) {
         Ok(val) => val,

@@ -4,123 +4,108 @@ use chrono::prelude::*;
 impl ByteString {
 
     pub fn date_match(&self) -> CSVType {
-        let d = &self.s.trim().to_string();
-        match d.len() {
-            10 => {
+        let date = &self.s.replace("/", "-").trim().to_string();
+        match date.len() {
+            10 => match date {
                 // mm/dd/yyyy
-                if &d[2..3] == "/" && &d[5..6] == "/" 
-                || &d[2..3] == "-" && &d[5..6] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%m/%d/%Y") {
-                        Ok(date) => {
-                            return CSVType::Date(date.to_string())
-                        },
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
+                d if &d[2..3] == "-" && &d[5..6] == "-"
+                => match NaiveDate::parse_from_str(d, "%m-%d-%Y") {
+                    Ok(date) => {
+                        return CSVType::Date(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
                 }
                 // yyyy/mm/dd
-                else if &d[4..5] == "/" && &d[7..8] == "/" 
-                || &d[4..5] == "-" && &d[7..8] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%Y/%d/%m") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                d if &d[4..5] == "-" && &d[7..8] == "-"
+                => match NaiveDate::parse_from_str(d, "%Y-%m-%d") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
+                    },
+                } 
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
                 }
             },
-            9 => {
+            9 => match date {
                 // m/dd/yyyy
-                if &d[1..2] == "/" && &d[4..5] == "/" 
-                || &d[1..2] == "-" && &d[4..5] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%m/%d/%Y") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                }
+                d if &d[1..2] == "-" && &d[4..5] == "-" 
+                => match NaiveDate::parse_from_str(d, "%m-%d-%Y") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
                 // mm/d/yyyy
-                else if &d[2..3] == "/" && &d[4..5] == "/" 
-                || &d[2..3] == "-" && &d[4..5] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%m/%d/%Y") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                }
+                d if &d[2..3] == "-" && &d[4..5] == "-" 
+                => match NaiveDate::parse_from_str(d, "%m-%d-%Y") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
                 // yyyy/mm/d
-                else if &d[4..5] == "/" && &d[7..8] == "/" 
-                || &d[4..5] == "-" && &d[7..8] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%Y/%d/%m") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                }
+                d if &d[4..5] == "-" && &d[7..8] == "-" 
+                => match NaiveDate::parse_from_str(d, "%Y-%m-%d") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
                 // yyyy/m/dd
-                else if &d[4..5] == "/" && &d[6..7] == "/" 
-                || &d[4..5] == "-" && &d[6..7] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%Y/%d/%m") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                d if &d[4..5] == "-" && &d[6..7] == "-" 
+                => match NaiveDate::parse_from_str(d, "%Y-%m-%d") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
-                }
+                    },
+                } 
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
             },
-            8 => {
+            8 => match date {
                 // m/d/yyyy
-                if &d[1..2] == "/" && &d[3..4] == "/" 
-                || &d[1..2] == "-" && &d[3..4] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%m/%d/%Y") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                }
-                // yyyy/m/d
-                else if &d[4..5] == "/" && &d[6..7] == "/" 
-                || &d[4..5] == "-" && &d[6..7] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%Y/%d/%m") {
-                        Ok(date) => return CSVType::Date(date.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                // } 
-                // // mm/dd/yy
-                // if &d[2..3] == "/" && &d[5..6] == "/" 
-                // || &d[2..3] == "-" && &d[5..6] == "-" {
-                //     return CSVType::Date((*self.s).to_string());
-                } else {
-                    match self.s.parse::<String>() {
+                d if &d[1..2] == "-" && &d[3..4] == "-" 
+                => match NaiveDate::parse_from_str(&*self.s.replace("/", "-"), "%m-%d-%Y") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
-                }
+                    },
+                },
+                // yyyy/m/d
+                d if &d[4..5] == "-" && &d[6..7] == "-" 
+                => match NaiveDate::parse_from_str(&*self.s.replace("/", "-"), "%Y-%m-%d") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/dd/yy
+                d if &d[2..3] == "-" && &d[5..6] == "-"
+                => match NaiveDate::parse_from_str(&*self.s.replace("/", "-"), "%m-%d-%y") {
+                    Ok(date) => return CSVType::Date(date.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
             },
             // 7 => {
             //     // m/dd/yy
@@ -164,172 +149,360 @@ impl ByteString {
     }   
 
     pub fn time_match(&self) -> CSVType {
-        let d = &self.s.trim().to_string();
-        match d.len() {
-            11 => {
-                // hh:mm:ss AM || PM
-                if &d[2..3] == ":" && &d[5..6] == ":"
-                && &d.to_uppercase()[d.len() - 1..d.len()] == "M"
-                && &d.to_uppercase()[d.len() - 2..d.len() - 1] == "A"
-                || &d.to_uppercase()[d.len() - 2..d.len() - 1] == "P" {
-                    match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %p") {
+        let time = &self.s.trim().to_string();
+        match time {
+            t if t.to_uppercase().contains("AM") 
+            => match t {
+                tam if tam.len() < 10
+                => match tam {
+                    // hh:mm AM 
+                    tam if &tam[2..3] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%I:%M %P") {
                         Ok(time) => return CSVType::Time(time.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
                             Err(e) => return CSVType::Error(e),
                         },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
-                        Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
-                    };
-                }
-            },
-            10 => {
-                // h:mm:ss AM || PM
-                if &d[1..2] == ":" && &d[4..5] == ":"
-                && &d.to_uppercase()[d.len() - 1..d.len()] == "M"
-                && &d.to_uppercase()[d.len() - 2..d.len() - 1] == "A"
-                || &d.to_uppercase()[d.len() - 2..d.len() - 1] == "P" {
-                    match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %p") {
+                    },
+                    // h:mm AM
+                    tam if &tam[1..2] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%I:%M %P") {
                         Ok(time) => return CSVType::Time(time.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
                             Err(e) => return CSVType::Error(e),
                         },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                    },
+                    _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
+                    },
+                },
+                // hh:mm:ss AM
+                tam if &tam[2..3] == ":" && &tam[5..6] == ":" 
+                => match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %P") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // h:mm:ss AM
+                tam if &tam[1..2] == ":" && &tam[4..5] == ":"
+                => match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %P") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
                 }
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
             },
-            8 => {
+            t if t.to_uppercase().contains("PM") 
+            => match t {
+                tpm if tpm.len() < 10
+                => match tpm {
+                    // hh:mm PM 
+                    tpm if &tpm[2..3] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%I:%M %p") {
+                        Ok(time) => return CSVType::Time(time.to_string()),
+                        Err(_) => match self.s.parse::<String>() {
+                            Ok(s) => return CSVType::String(s),
+                            Err(e) => return CSVType::Error(e),
+                        },
+                    },
+                    // h:mm PM
+                    tpm if &tpm[1..2] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%I:%M %p") {
+                        Ok(time) => return CSVType::Time(time.to_string()),
+                        Err(_) => match self.s.parse::<String>() {
+                            Ok(s) => return CSVType::String(s),
+                            Err(e) => return CSVType::Error(e),
+                        },
+                    },
+                    _ => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // hh:mm:ss PM
+                tpm if &tpm[2..3] == ":" && &tpm[5..6] == ":" 
+                => match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %p") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // h:mm:ss PM
+                tpm if &tpm[1..2] == ":" && &tpm[4..5] == ":"
+                => match NaiveTime::parse_from_str(&*self.s, "%I:%M:%S %p") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                }
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
+            },
+            t =>  match t {
+                t if t.len() < 7
+                => match t {
+                    // hh:mm 
+                    t if &t[2..3] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%H:%M") {
+                        Ok(time) => return CSVType::Time(time.to_string()),
+                        Err(_) => match self.s.parse::<String>() {
+                            Ok(s) => return CSVType::String(s),
+                            Err(e) => return CSVType::Error(e),
+                        },
+                    },
+                    // h:mm
+                    t if &t[1..2] == ":" 
+                    => match NaiveTime::parse_from_str(&*self.s, "%H:%M") {
+                        Ok(time) => return CSVType::Time(time.to_string()),
+                        Err(_) => match self.s.parse::<String>() {
+                            Ok(s) => return CSVType::String(s),
+                            Err(e) => return CSVType::Error(e),
+                        },
+                    },
+                    _ => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                }
                 // hh:mm:ss
-                if &d[2..3] == ":" && &d[5..6] == ":" {
-                    match NaiveTime::parse_from_str(&*self.s, "%H:%M:%S") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } 
-                // hh:mm AM || PM
-                else if &d[2..3] == ":"
-                && &d.to_uppercase()[d.len() - 1..d.len()] == "M"
-                && &d.to_uppercase()[d.len() - 2..d.len() - 1] == "A"
-                || &d.to_uppercase()[d.len() - 2..d.len() - 1] == "P" {
-                    match NaiveTime::parse_from_str(&*self.s, "%I:%M %p") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                t if &t[2..3] == ":" && &t[5..6] == ":" 
+                => match NaiveTime::parse_from_str(&*self.s, "%H:%M:%S") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
-                }
-            },
-            7 => {
+                    },
+                },
                 // h:mm:ss
-                if &d[1..2] == ":" && &d[4..5] == ":" {
-                    match NaiveTime::parse_from_str(&*self.s, "%H:%M:%S") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                }
-                // h:mm AM || PM
-                else if &d[1..2] == ":"
-                && &d.to_uppercase()[d.len() - 1..d.len()] == "M"
-                && &d.to_uppercase()[d.len() - 2..d.len() - 1] == "A"
-                || &d.to_uppercase()[d.len() - 2..d.len() - 1] == "P" {
-                    match NaiveTime::parse_from_str(&*self.s, "%I:%M %p") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                t if &t[1..2] == ":" && &t[4..5] == ":"
+                => match NaiveTime::parse_from_str(&*self.s, "%H:%M:%S") {
+                    Ok(time) => return CSVType::Time(time.to_string()),
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
-                }
-            },
-            5 => {
-                // hh:mm
-                if &d[2..3] == ":" {
-                    match NaiveTime::parse_from_str(&*self.s, "%H:%M") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
-                        Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
-                    };
-                }
-            },
-            4 => {
-                // h:mm
-                if &d[1..2] == ":" {
-                    match NaiveTime::parse_from_str(&*self.s, "%H:%M") {
-                        Ok(time) => return CSVType::Time(time.to_string()),
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
-                        Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
-                    };
-                }
-            },
-            _ => match self.s.parse::<String>() {
-                Ok(s) => return CSVType::String(s),
-                Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
             },
         }
     }
 
     pub fn datetime_match(&self) -> CSVType {
-        let d = &self.s.trim().to_string();
-        match d.len() {
-            16 => {
+        let datetime = &self.s.replace("/", "-").trim().to_string();
+        match datetime.len() {
+            16 => match datetime {
                 // mm/dd/yyyy hh:mm
-                if &d[13..14] == ":"
-                && &d[2..3] == "/" && &d[5..6] == "/" 
-                || &d[2..3] == "-" && &d[5..6] == "-" {
-                    match NaiveDate::parse_from_str(&*self.s.replace("-", "/"), "%m/%d/%Y %H:%M") {
-                        Ok(date) => {
-                            return CSVType::DateTime(date.to_string())
-                        },
-                        Err(_) => match self.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
-                } else {
-                    match self.s.parse::<String>() {
+                dt if &dt[13..14] == ":"
+                && &dt[2..3] == "-" && &dt[5..6] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
                         Err(e) => return CSVType::Error(e),
-                    };
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
                 }
+            },
+            15 => match datetime {
+                // mm/dd/yyyy h:mm
+                dt if &dt[12..13] == ":"
+                && &dt[2..3] == "-" && &dt[5..6] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // m/dd/yyyy hh:mm
+                dt if &dt[12..13] == ":"
+                && &dt[1..2] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/d/yyyy hh:mm
+                dt if &dt[12..13] == ":"
+                && &dt[2..3] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
+            },
+            14 => match datetime {
+                // m/dd/yyyy h:mm
+                dt if &dt[11..12] == ":"
+                && &dt[1..2] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/d/yyyy h:mm
+                dt if &dt[11..12] == ":"
+                && &dt[2..3] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // m/d/yyyy hh:mm
+                dt if &dt[11..12] == ":"
+                && &dt[1..2] == "-" && &dt[3..4] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/dd/yy hh:mm
+                dt if &dt[11..12] == ":"
+                && &dt[2..3] == "-" && &dt[5..6] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
+            },
+            13 => match datetime {
+                // m/d/yyyy h:mm
+                dt if &dt[10..11] == ":"
+                && &dt[1..2] == "-" && &dt[3..4] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%Y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/dd/yy h:mm
+                dt if &dt[10..11] == ":"
+                && &dt[2..3] == "-" && &dt[5..6] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // m/dd/yy hh:mm
+                dt if &dt[10..11] == ":"
+                && &dt[1..2] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/d/yy hh:mm
+                dt if &dt[10..11] == ":"
+                && &dt[2..3] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
+            },
+            12 => match datetime {
+                // m/dd/yy h:mm
+                dt if &dt[9..10] == ":"
+                && &dt[1..2] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                // mm/d/yy h:mm
+                dt if &dt[9..10] == ":"
+                && &dt[2..3] == "-" && &dt[4..5] == "-" 
+                => match NaiveDateTime::parse_from_str(dt, "%m-%d-%y %H:%M") {
+                    Ok(date) => {
+                        return CSVType::DateTime(date.to_string())
+                    },
+                    Err(_) => match self.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
+                _ => match self.s.parse::<String>() {
+                    Ok(s) => return CSVType::String(s),
+                    Err(e) => return CSVType::Error(e),
+                },
             },
             _ => match self.s.parse::<String>() {
                 Ok(s) => return CSVType::String(s),
