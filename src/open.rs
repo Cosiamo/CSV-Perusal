@@ -1,32 +1,33 @@
 use crate::csvtype::{CSVType, ByteString};
 use std::{fs::File, path::Path, io::BufReader};
 
-pub fn open_csv(path: &str) -> Result<Vec<CSVType>, csv::Error> {
-    let mut datatype: Vec<CSVType> = Vec::new();
+pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
+    let mut outtervec: Vec<Vec<CSVType>> = Vec::new();
 
     match csv_read(path) {
         Ok(data) => {
             for y in 0..data.len() {
+                let mut innervec: Vec<CSVType> = Vec::new();
                 for (_x, bytes) in data[y].iter().enumerate() {
                     match bytes {
-                        [] => datatype.push(CSVType::Empty), 
+                        [] => innervec.push(CSVType::Empty), 
                         _ => {
                             match String::from_utf8((&bytes).to_vec()) {
                                 Ok(s) => match s.parse::<i64>() {
-                                    Ok(v) => datatype.push(CSVType::Int(v)),
+                                    Ok(v) => innervec.push(CSVType::Int(v)),
                                     Err(_) => match s.parse::<f64>() {
-                                        Ok(v) => datatype.push(CSVType::Float(v)),
-                                        Err(_) => datatype.push(match_catch(s))
+                                        Ok(v) => innervec.push(CSVType::Float(v)),
+                                        Err(_) => innervec.push(match_catch(s))
                                     },
                                 },
                                 Err(_) => {
                                     let t = String::from_utf8_lossy(&bytes);
                                     let s = t.replace(|c: char| !c.is_ascii(), "");
                                     match s.parse::<i64>() {
-                                        Ok(v) => datatype.push(CSVType::Int(v)),
+                                        Ok(v) => innervec.push(CSVType::Int(v)),
                                         Err(_) => match s.parse::<f64>() {
-                                            Ok(v) => datatype.push(CSVType::Float(v)),
-                                            Err(_) => datatype.push(match_catch(s))
+                                            Ok(v) => innervec.push(CSVType::Float(v)),
+                                            Err(_) => innervec.push(match_catch(s))
                                         },
                                     }
                                 },
@@ -34,12 +35,13 @@ pub fn open_csv(path: &str) -> Result<Vec<CSVType>, csv::Error> {
                         }
                     }
                 }
+                outtervec.push(innervec)
             }
         },
         Err(e) => return Err(e),
     };
 
-    Ok(datatype)
+    Ok(outtervec)
 }
 
 fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
@@ -125,15 +127,14 @@ fn match_catch(s: String) -> CSVType {
                     }
                 },
             },
-            false => {
-                match bytestring {
+            false => match bytestring {
                 bs if bs.is_datetime() => return bs.datetime_match(),
                 bs if bs.is_time_12h() => return bs.time_match(),
                 _ => match bytestring.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
                     Err(e) => return CSVType::Error(e),
                 },
-            }}
+            }
         },
     }
 }
