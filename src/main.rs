@@ -1,20 +1,20 @@
-extern crate csv_reader;
+extern crate csv_perusal;
 // use csv::ByteRecord;
-use csv_reader::{open::open_csv, csvtype::CSVType};
+use csv_perusal::{open::open_csv, csvtype::CSVType};
 
 fn main() {
-    let _path = "test_data/Employee_Sample_Data_Limited.csv";
-    let path = "test_data/MOCK_DATA.csv";
+    let path = "test_data/Employee_Sample_Data_Limited.csv";
+    let _path = "test_data/MOCK_DATA.csv";
     let _path = "test_data/DATA10ROWS.csv";
     let _path = "test_data/temp.csv";
 
-    let data = match open_csv(path) {
-        Ok(val) => val,
-        Err(e) => panic!("{:?}", e),
-    };
+    // let data = match open_csv(path) {
+    //     Ok(val) => val,
+    //     Err(e) => panic!("{:?}", e),
+    // };
+    let data = open_csv(path).unwrap();
 
-
-    for row in data.iter() {
+    for (y, row) in data.iter().enumerate() {
         for column in row.iter() {
             match column {
                 CSVType::Int(val) => print!("INT: {:?}, ", val),
@@ -28,5 +28,8 @@ fn main() {
             }
         }
         print!("\n");
+        if y == 0 {
+            println!("-----------------------------");
+        }
     }
 }
