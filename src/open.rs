@@ -81,78 +81,38 @@ fn match_catch(s: String) -> CSVType {
                 bs if bs.is_date() => return bs.date_match(),
                 // checks for positive percent
                 bs if bs.is_percent_pos()
-                => match bs {
-                    bs if bs.s.contains(".")
-                    => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v / 100.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    },
-                    _ => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
+                => match bs.remove_symbol().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
                     },
                 },
                 // checks for negative percent
                 bs if bs.is_percent_neg()
-                => match bs {
-                    bs if bs.s.contains(".")
-                    => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float((v * -1.0) / 100.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    },
-                    _ => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v * -1.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
+                => match bs.remove_symbol().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
                     },
                 },
                 // checks for positive currency 
                 bs if bs.is_currency_pos()
-                => match bs {
-                    bs if bs.s.contains(".")
-                    => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v / 100.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    },
-                    _ => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
+                => match bs.remove_symbol().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
                     },
                 },
                 // checks for negative currency
                 bs if bs.is_currency_neg()
-                => match bs {
-                    bs if bs.s.contains(".")
-                    => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float((v * -1.0) / 100.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    },
-                    _ => match bs.trimmed().parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v * -1.0),
-                        Err(_) => match bs.s.parse::<String>() {
-                            Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
-                        },
+                => match bs.remove_symbol().parse::<f64>() {
+                    Ok(v) => return CSVType::Float(v),
+                    Err(_) => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
                     },
                 },
                 // catch

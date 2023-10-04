@@ -18,6 +18,19 @@ impl ByteString {
         .replace("₹", "")
         .replace("د.ك", "")
     }
+
+    pub fn remove_symbol(&self) -> String {
+        return self.s.trim()
+        .replace(",", "")
+        .replace("%", "")
+        .replace("$", "")
+        .replace("€", "")
+        .replace("£", "")
+        .replace("¥", "")
+        .replace("₣", "")
+        .replace("₹", "")
+        .replace("د.ك", "")
+    }
 }
 
 // all num matches
