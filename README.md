@@ -18,14 +18,14 @@ CSV Perusal is built with uploading values from CSV files into relational databa
 
 CSV Perusal is very simple and easy to use. You only need to know one function and one enumerator. 
 The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which returns any of the following:
-    - Int(i64)
-    - Float(f64)
-    - String(String)
-    - Date(String)
-    - Time(String)
-    - DateTime(String)
-    - Error(std::convert::Infallible)
-    - Empty
+- Int(i64)
+- Float(f64)
+- String(String)
+- Date(String)
+- Time(String)
+- DateTime(String)
+- Error(std::convert::Infallible)
+- Empty
 
 ```rust
 use csv_perusal::{open::open_csv, csvtype::CSVType};
