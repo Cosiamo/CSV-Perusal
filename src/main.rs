@@ -3,10 +3,10 @@ extern crate csv_perusal;
 use csv_perusal::{open::open_csv, csvtype::CSVType};
 
 fn main() {
-    let path = "test_data/Employee_Sample_Data_Limited.csv";
+    let _path = "test_data/Employee_Sample_Data_Limited.csv";
     let _path = "test_data/MOCK_DATA.csv";
     let _path = "test_data/DATA10ROWS.csv";
-    let _path = "test_data/temp.csv";
+    let path = "test_data/temp.csv";
 
     // let data = match open_csv(path) {
     //     Ok(val) => val,

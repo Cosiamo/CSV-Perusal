@@ -9,11 +9,23 @@ CSV Perusal is built with uploading values from CSV files into relational databa
 - Percentages and currency are converted into floats 
 - Times and dates are formatted by [Chrono](https://github.com/chronotope/chrono)
     - It will attempt `mm/dd/yyyy` and `yyyy/mm/dd` formats first but will change to `dd/mm/yyyy` or `yyyy/dd/mm` if month value is greater than 12. Please be aware if you have dates in `dd/mm/yyyy` format, dates such as 2/11/2024 will be read as February 11th instead of November 2nd.
-    - Will output dates as `yyyy-mm-dd` but you can use the chrono package to change the format
+    - Will output dates as `yyyy-mm-dd` but you can use the Chrono package to change the format
     - Currently parses: `mm/dd/yyyy`, `dd/mm/yyyy`, `yyyy/mm/dd`, `yyyy/dd/mm`, `m/dd/yyyy`, `mm/d/yyyy`, `dd/m/yyyy`, `yyyy/mm/d`, `yyyy/dd/m`, `yyyy/m/dd`, `m/d/yyyy`, `yyyy/m/d`, `mm/dd/yy`, `dd/mm/yy`, `m/dd/yy`, `mm/d/yy`, `dd/m/yy`, `yy/m/dd`, `yy/mm/d`, `yy/dd/m`, `m/d/yy`, `yy/m/d` 
-- Time is in a 24 hour format
+- Time is in a 24 hour format but can also be changed to a 12 hour format with Chrono
+- The Error in the CSVType enumerator is `std::convert::Infallible` which is used when there's an issue parsing datatypes. The only other error is if the <i>path</i> for open_csv() is invalid.
 
 ## Example
+
+CSV Perusal is very simple and easy to use. You only need to know one function and one enumerator. 
+The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which returns any of the following:
+    - Int(i64)
+    - Float(f64)
+    - String(String)
+    - Date(String)
+    - Time(String)
+    - DateTime(String)
+    - Error(std::convert::Infallible)
+    - Empty
 
 ```rust
 use csv_perusal::{open::open_csv, csvtype::CSVType};
@@ -45,19 +57,22 @@ fn main() {
 
 ```
 
+### Input
+
+| id | Money | Percent | Date | DateTime | Time12h | Time24h |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| 1	| $8.70 | 34.1% | 5/28/2023 | 10/25/2023 19:48 | 5:31 PM | 23:02 |
+| 2 | $6.08 | 90.10% | 2/7/2023 | 11/4/2023 1:58 | 6:47 AM | 14:11 |
+| 3 | $6.44  | 50.10% | 7/24/2023 | 7/4/2023 1:04 | 12:32 PM | 17:27 |
+| 4 | $4.99  | 15.60% | 12/29/2022 | 12/4/2023 11:34 | 5:17 PM | 4:53 |
+
 ### Result
 
 ```
-STRING: "Employee ID", STRING: "Job Title", STRING: "Department", STRING: "Business Unit", STRING: "Hire Date", STRING: "Annual Salary", STRING: "Bonus %", STRING: "Country", STRING: "City", STRING: "Exit Date",
+STRING: "id", STRING: "Money", STRING: "Percent", STRING: "Date", STRING: "DateTime", STRING: "Time12h", STRING: "Time24h",
 -----------------------------
-STRING: "E02002", STRING: "Controls Engineer", STRING: "Engineering", STRING: "Manufacturing", DATE: "2022-02-05", FLOAT: 92368.0, FLOAT: 0.0, STRING: "United States", STRING: "Columbus", NONE,
-STRING: "E02003", STRING: "Analyst", STRING: "Sales", STRING: "Corporate", DATE: "2013-10-23", FLOAT: 45703.0, FLOAT: 0.0, STRING: "United States", STRING: "Chicago", NONE,
-STRING: "E02004", STRING: "Network Administrator", STRING: "IT", STRING: "Research & Development", DATE: "2019-03-24", FLOAT: 83576.0, FLOAT: 0.0, STRING: "China", STRING: "Shanghai", NONE,
-STRING: "E02005", STRING: "IT Systems Architect", STRING: "IT", STRING: "Corporate", DATE: "2018-04-07", FLOAT: 98062.0, FLOAT: 0.0, STRING: "United States", STRING: "Seattle", NONE,
-STRING: "E02006", STRING: "Director", STRING: "Engineering", STRING: "Corporate", DATE: "2005-06-18", FLOAT: 175391.0, FLOAT: 24.0, STRING: "United States", STRING: "Austin", NONE,
-STRING: "E02007", STRING: "Network Administrator", STRING: "IT", STRING: "Manufacturing", DATE: "2004-04-22", FLOAT: 66227.0, FLOAT: 0.0, STRING: "United States", STRING: "Phoenix", DATE: "2014-02-14",
-STRING: "E02008", STRING: "Sr. Analyst", STRING: "Accounting", STRING: "Specialty Products", DATE: "2009-06-27", FLOAT: 89744.0, FLOAT: 0.0, STRING: "China", STRING: "Chongqing", NONE,
-STRING: "E02009", STRING: "Analyst II", STRING: "Finance", STRING: "Corporate", DATE: "1999-02-19", FLOAT: 69674.0, FLOAT: 0.0, STRING: "China", STRING: "Chengdu", NONE,
-STRING: "E02010", STRING: "System Administrator", STRING: "IT", STRING: "Manufacturing", DATE: "2011-09-09", FLOAT: 97630.0, FLOAT: 0.0, STRING: "United States", STRING: "Seattle", NONE,
-STRING: "E02011", STRING: "Manager", STRING: "Finance", STRING: "Specialty Products", DATE: "2015-02-05", FLOAT: 105879.0, FLOAT: 10.0, STRING: "United States", STRING: "Miami", NONE,
+INT: 1, FLOAT: 8.7, FLOAT: 34.1, DATE: "2023-05-28", DATETIME: "2023-10-25 19:48:00", TIME: "17:31:00", TIME: "23:02:00",
+INT: 2, FLOAT: 6.08, FLOAT: 90.1, DATE: "2023-02-07", DATETIME: "2023-11-04 01:58:00", TIME: "06:47:00", TIME: "14:11:00",
+INT: 3, FLOAT: 6.44, FLOAT: 50.1, DATE: "2023-07-24", DATETIME: "2023-07-04 01:04:00", TIME: "12:32:00", TIME: "17:27:00",
+INT: 4, FLOAT: 4.99, FLOAT: 15.6, DATE: "2022-12-29", DATETIME: "2023-12-04 11:34:00", TIME: "17:17:00", TIME: "04:53:00",
 ```
