@@ -6,7 +6,7 @@ license = "Apache-2.0"
 description = "Reads CSV files and returns the contents of the file with the appropriate datatype."
 readme = "README.md"
 repository = "https://github.com/Cosiamo/CSV-Perusal"
-keywords = ["csv", "parser", "parsing", "reader", "reading", "datatype", "types", "data"]
+keywords = ["csv", "parser", "reader", "datatype", "data"]
 categories = ["data-structures", "development-tools", "template-engine", "encoding", "parsing"]
 exclude = ["main.rs", ".vscode/*", ".gitignore"]
 
