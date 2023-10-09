@@ -37,168 +37,218 @@ impl ByteString {
 impl ByteString {
 
     pub fn is_date(&self) -> bool {
-        let date_regex = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$").unwrap();
-        match date_regex.captures(self.s.replace("-", "/").trim()) {
-            Some(_) => true,
-            None => false,
+        match self.s.trim() {
+            s if s.contains("-")
+            || s.contains("/")
+            => {
+                let date_regex = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$").unwrap();
+                match date_regex.captures(s) {
+                    Some(_) => true,
+                    None => false,
+                }
+            },
+            _ => false,
         }
     }
 
-    pub fn is_time(&self) -> bool {
-        let hours_mins = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
-        let hours_mins_secs = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
+    pub fn is_time_24h(&self) -> bool {
         match self.s.trim() {
-            s if hours_mins.captures(s).is_some()
-            || hours_mins_secs.captures(s).is_some()
-            => true,
+            s if s.contains(":")
+            => {
+                let hours_mins = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
+                match hours_mins.captures(s) {
+                    Some(_) => true,
+                    None => {
+                        let hours_mins_secs = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
+                        match hours_mins_secs.captures(s) {
+                            Some(_) => true,
+                            None => false,
+                        }
+                    },
+                }
+            },
             _ => false,
         }
     }
 
     pub fn is_percent_pos(&self) -> bool {
-        match self.s.trim().chars().map(|x| x).collect::<Vec<char>>() {
-            chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
+        match self.s.trim() {
+            s if s.contains("%")
+            => match s.chars().map(|x| x).collect::<Vec<char>>() {
+                chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                => true,
+                chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
+                && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                => true,
+                _ => false,
+            },
             _ => false,
         }
     }
 
     pub fn is_percent_neg(&self) -> bool {
-        match self.s.trim().chars().map(|x| x).collect::<Vec<char>>() {
-            chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
+        match self.s.trim() {
+            s if s.contains("%")
+            && s.contains("-")
+            => match s.chars().map(|x| x).collect::<Vec<char>>() {
+                chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
+                && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                => true,
+                chars if chars.contains(&"%".chars().map(|x| x).collect::<Vec<char>>()[0])
+                && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                => true,
+                _ => false,
+            },
             _ => false,
         }
     }
 
     pub fn is_currency_pos(&self) -> bool {
-        match self.s.trim().chars().map(|x| x).collect::<Vec<char>>() {
-            // $
-            chars if chars[0] == "$".chars().map(|x| x).collect::<Vec<char>>()[0] 
-            => true,
-            chars if chars[0] == "$".chars().map(|x| x).collect::<Vec<char>>()[0] 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            // €
-            chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            // £
-            chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            // ¥
-            chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            // ₣
-            chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            // ₹
-            chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0])
-            => true,
-            // د.ك
-            chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
-            chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            => true,
+        match self.s.trim() {
+            s if s.contains("$")
+            || s.contains("€")
+            || s.contains("£")
+            || s.contains("¥")
+            || s.contains("₣")
+            || s.contains("₹")
+            || s.contains("د.ك")
+            => {
+                match s.chars().map(|x| x).collect::<Vec<char>>() {
+                    // $
+                    chars if chars[0] == "$".chars().map(|x| x).collect::<Vec<char>>()[0] 
+                    => true,
+                    chars if chars[0] == "$".chars().map(|x| x).collect::<Vec<char>>()[0] 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    // €
+                    chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    // £
+                    chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    // ¥
+                    chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    // ₣
+                    chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    // ₹
+                    chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0])
+                    => true,
+                    // د.ك
+                    chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    => true,
+                    _ => false,
+                }
+            },
             _ => false,
         }
     }
 
     pub fn is_currency_neg(&self) -> bool {
-        match self.s.trim().chars().map(|x| x).collect::<Vec<char>>() {
-            // $
-            chars if chars.contains(&"$".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"$".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // €
-            chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // £
-            chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // ¥
-            chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0]
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // ₣
-            chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0]
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // ₹
-            chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            // د.ك
-            chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
-            chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
-            && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
-            => true,
+        match self.s.trim() {
+            s if s.contains("-")
+            && s.contains("$")
+            || s.contains("€")
+            || s.contains("£")
+            || s.contains("¥")
+            || s.contains("₣")
+            || s.contains("₹")
+            || s.contains("د.ك")
+            => {
+                match s.chars().map(|x| x).collect::<Vec<char>>() {
+                    // $
+                    chars if chars.contains(&"$".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"$".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // €
+                    chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"€".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // £
+                    chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"£".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // ¥
+                    chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0]
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"¥".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // ₣
+                    chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0]
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"₣".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // ₹
+                    chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"₹".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    // د.ك
+                    chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    chars if chars.contains(&"د.ك".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars.contains(&".".chars().map(|x| x).collect::<Vec<char>>()[0]) 
+                    && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    || chars[1] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 
+                    => true,
+                    _ => false,
+                }
+            },
             _ => false,
         }
     }
@@ -223,33 +273,64 @@ impl ByteString {
     }
 
     pub fn is_time_12h(&self) -> bool {
-        let hours_mins = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
-        let hours_mins_secs = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
-
         match self.s.trim() {
-            t if hours_mins.captures(t).is_some()
-            => true,
-            t if hours_mins_secs.captures(t).is_some()
-            => true,
+            s if s.contains(":")
+            && s.to_ascii_uppercase().contains("AM")
+            || s.to_ascii_uppercase().contains("PM")
+            => {
+                let hours_mins = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
+                match hours_mins.captures(s) {
+                    Some(_) => true,
+                    None => {
+                        let hours_mins_secs = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
+                        match hours_mins_secs.captures(s) {
+                            Some(_) => true,
+                            None => false
+                        }
+                    },
+                }
+            },
             _ => false,
         }
     }
 
     pub fn is_datetime(&self) -> bool {
-        let h24 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
-        let h24_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
-        let h12 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
-        let h12_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
-
         match self.s.trim() {
-            dt if h24.captures(dt).is_some()
-            => true,
-            dt if h24_w_sec.captures(dt).is_some()
-            => true,
-            dt if h12.captures(dt).is_some() 
-            => true,
-            dt if h12_w_sec.captures(dt).is_some()
-            => true,
+            s if s.contains(":")
+            && s.contains("-")
+            || s.contains("/")
+            => {
+                match s {
+                    s if s.to_ascii_uppercase().contains("AM")
+                    || s.to_ascii_uppercase().contains("PM") 
+                    => {
+                        let h12 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
+                        match h12.captures(s) {
+                            Some(_) => true,
+                            None => {
+                                let h12_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
+                                match h12_w_sec.captures(s) {
+                                    Some(_) => true,
+                                    None => false,
+                                }
+                            },
+                        }
+                    },
+                    _ => {
+                        let h24 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
+                        match h24.captures(s) {
+                            Some(_) => true,
+                            None => {
+                                let h24_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
+                                match h24_w_sec.captures(s) {
+                                    Some(_) => true,
+                                    None => false,
+                                }
+                            },
+                        }
+                    },
+                }
+            },
             _ => false,
         }
     }
