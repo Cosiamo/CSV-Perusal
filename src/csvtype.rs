@@ -1,3 +1,6 @@
+use core::fmt;
+
+#[derive(Debug)]
 pub enum CSVType {
     Int(i64),
     Float(f64),
@@ -8,6 +11,13 @@ pub enum CSVType {
     Error(std::convert::Infallible),
     Empty,
 }
+
+impl fmt::Display for CSVType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
+}
+
 pub struct ByteString {
     pub(crate) s: String,
 }
