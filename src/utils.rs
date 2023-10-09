@@ -46,15 +46,12 @@ impl ByteString {
 
     pub fn is_time(&self) -> bool {
         let hours_mins = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
-        match hours_mins.captures(self.s.trim()) {
-            Some(_) => true,
-            None => {
-                let hours_mins_secs = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
-                match hours_mins_secs.captures(self.s.trim()) {
-                    Some(_) => true,
-                    None => false,
-                }
-            },
+        let hours_mins_secs = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
+        match self.s.trim() {
+            s if hours_mins.captures(s).is_some()
+            || hours_mins_secs.captures(s).is_some()
+            => true,
+            _ => false,
         }
     }
 
@@ -210,6 +207,20 @@ impl ByteString {
 
 // false num catch matches
 impl ByteString {
+
+    pub fn contains_number(&self) -> bool {
+        let v = self.s.trim().chars().map(|x| 
+            match x {
+                x if x.is_numeric() => true,
+                _ => false,
+            }
+        ).collect::<Vec<bool>>();
+
+        match v {
+            v if v.contains(&true) => true,
+            _ => false,
+        }
+    }
 
     pub fn is_time_12h(&self) -> bool {
         let hours_mins = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();

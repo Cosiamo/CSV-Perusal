@@ -13,9 +13,9 @@ pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
                         [] => innervec.push(CSVType::Empty), 
                         _ => {
                             match String::from_utf8((&bytes).to_vec()) {
-                                Ok(s) => match s.parse::<i64>() {
+                                Ok(s) => match s.trim().parse::<i64>() {
                                     Ok(v) => innervec.push(CSVType::Int(v)),
-                                    Err(_) => match s.parse::<f64>() {
+                                    Err(_) => match s.trim().parse::<f64>() {
                                         Ok(v) => innervec.push(CSVType::Float(v)),
                                         Err(_) => innervec.push(match_catch(s))
                                     },
@@ -23,9 +23,9 @@ pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
                                 Err(_) => {
                                     let t = String::from_utf8_lossy(&bytes);
                                     let s = t.replace(|c: char| !c.is_ascii(), "");
-                                    match s.parse::<i64>() {
+                                    match s.trim().parse::<i64>() {
                                         Ok(v) => innervec.push(CSVType::Int(v)),
-                                        Err(_) => match s.parse::<f64>() {
+                                        Err(_) => match s.trim().parse::<f64>() {
                                             Ok(v) => innervec.push(CSVType::Float(v)),
                                             Err(_) => innervec.push(match_catch(s))
                                         },
@@ -116,20 +116,21 @@ fn match_catch(s: String) -> CSVType {
                     },
                 },
                 // catch
-                _ => match bytestring.s.parse::<i64>() {
-                    Ok(v) => return CSVType::Int(v),
-                    Err(_) => match bytestring.s.parse::<f64>() {
-                        Ok(v) => return CSVType::Float(v),
-                        Err(_) => match bytestring.s.parse::<String>() {
-                            Ok(s) => {return CSVType::String(s)},
-                            Err(e) => return CSVType::Error(e),
-                        },
-                    }
+                _ => match bytestring.s.parse::<String>() {
+                    Ok(s) => {return CSVType::String(s)},
+                    Err(e) => return CSVType::Error(e),
                 },
             },
             false => match bytestring {
-                bs if bs.is_datetime() => return bs.datetime_match(),
-                bs if bs.is_time_12h() => return bs.time_match(),
+                bs if bs.contains_number()
+                => match bs {
+                    bs if bs.is_datetime() => return bs.datetime_match(),
+                    bs if bs.is_time_12h() => return bs.time_match(),
+                    bs => match bs.s.parse::<String>() {
+                        Ok(s) => return CSVType::String(s),
+                        Err(e) => return CSVType::Error(e),
+                    },
+                },
                 _ => match bytestring.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
                     Err(e) => return CSVType::Error(e),
