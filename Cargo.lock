@@ -96,7 +96,7 @@ dependencies = [
 
 [[package]]
 name = "csv_perusal"
-version = "0.5.2"
+version = "0.6.0"
 dependencies = [
  "chrono",
  "csv",
