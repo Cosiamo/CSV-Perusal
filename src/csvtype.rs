@@ -1,6 +1,7 @@
 use core::fmt;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CSVType {
     Int(i64),
     Float(f64),
@@ -8,7 +9,7 @@ pub enum CSVType {
     Date(String),
     Time(String),
     DateTime(String),
-    Error(std::convert::Infallible),
+    Error(String),
     Empty,
 }
 

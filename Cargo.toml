@@ -16,3 +16,4 @@ exclude = ["main.rs", ".vscode/*", ".gitignore"]
 csv = "1.2.2"
 chrono = "0.4.26"
 regex = "1.9.6"
+serde = {version = "1.0.188", features = ["derive"] }

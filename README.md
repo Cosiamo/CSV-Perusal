@@ -24,7 +24,7 @@ The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which 
 - Date(String)
 - Time(String)
 - DateTime(String)
-- Error(std::convert::Infallible)
+- Error(String) <b><u>THIS IS TEMPORARY</u></b>
 - Empty
 
 ```rust
@@ -36,8 +36,8 @@ fn main() {
     let data = open_csv(path).unwrap();
 
     for (y, row) in data.iter().enumerate() {
-        for column in row.iter() {
-            match column {
+        for cell in row.iter() {
+            match cell {
                 CSVType::Int(val) => print!("INT: {:?}, ", val),
                 CSVType::Float(val) => print!("FLOAT: {:?}, ", val),
                 CSVType::String(val) => print!("STRING: {:?}, ", val),

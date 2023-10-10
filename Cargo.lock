@@ -101,6 +101,7 @@ dependencies = [
  "chrono",
  "csv",
  "regex",
+ "serde",
 ]
 
 [[package]]

@@ -72,7 +72,7 @@ fn match_catch(s: String) -> CSVType {
         bs if !bs.contains_number()
         => match bs.s.parse::<String>() {
             Ok(s) => return CSVType::String(s),
-            Err(e) => return CSVType::Error(e),
+            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
         },
         bs if bs.trimmed().chars().all(char::is_numeric)
         => match bs {
@@ -82,7 +82,7 @@ fn match_catch(s: String) -> CSVType {
                 Ok(v) => return CSVType::Float(v),
                 Err(_) => match bs.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
                 },
             },
             // checks for positive percent
@@ -91,7 +91,7 @@ fn match_catch(s: String) -> CSVType {
                 Ok(v) => return CSVType::Float(v),
                 Err(_) => match bs.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
                 },
             },
             // checks for negative currency
@@ -100,7 +100,7 @@ fn match_catch(s: String) -> CSVType {
                 Ok(v) => return CSVType::Float(v),
                 Err(_) => match bs.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
                 },
             },
             // checks for positive currency 
@@ -109,7 +109,7 @@ fn match_catch(s: String) -> CSVType {
                 Ok(v) => return CSVType::Float(v),
                 Err(_) => match bs.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
                 },
             },
             // checks for time
@@ -119,7 +119,7 @@ fn match_catch(s: String) -> CSVType {
             // catch
             _ => match bs.s.parse::<String>() {
                 Ok(s) => {return CSVType::String(s)},
-                Err(e) => return CSVType::Error(e),
+                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
             },
         },
         bs if bs.contains_number()
@@ -128,12 +128,12 @@ fn match_catch(s: String) -> CSVType {
             bs if bs.is_datetime() => return bs.datetime_match(),
             bs => match bs.s.parse::<String>() {
                 Ok(s) => return CSVType::String(s),
-                Err(e) => return CSVType::Error(e),
+                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
             },
         },
         _ => match bytestring.s.parse::<String>() {
             Ok(s) => return CSVType::String(s),
-            Err(e) => return CSVType::Error(e),
+            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
         },
     }
 }

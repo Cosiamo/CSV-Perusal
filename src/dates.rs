@@ -16,7 +16,7 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
@@ -29,13 +29,13 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 }
             },
             9 => match date {
@@ -45,7 +45,7 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 // mm/d/yyyy
@@ -57,7 +57,7 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
@@ -70,7 +70,7 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
@@ -80,12 +80,12 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
             8 => match date {
@@ -95,7 +95,7 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 // yyyy/m/d
@@ -104,7 +104,7 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 // mm/dd/yy
@@ -116,13 +116,13 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
             7 => match date {
@@ -132,7 +132,7 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 // mm/d/yy
@@ -147,7 +147,7 @@ impl ByteString {
                             Ok(date) => return CSVType::Date(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -161,13 +161,13 @@ impl ByteString {
                         Ok(date) => return CSVType::Date(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
             6 => match date {
@@ -177,7 +177,7 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 // yy/m/d
@@ -186,17 +186,17 @@ impl ByteString {
                     Ok(date) => return CSVType::Date(date.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
             _ => match self.s.parse::<String>() {
                 Ok(s) => return CSVType::String(s),
-                Err(e) => return CSVType::Error(e),
+                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
             },
         }
     }   
@@ -212,7 +212,7 @@ impl ByteString {
                     Ok(time) => return CSVType::Time(time.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing time".to_string()),
                     },
                 },
                 // hh:mm:ss AM && h:mm:ss AM
@@ -220,7 +220,7 @@ impl ByteString {
                     Ok(time) => return CSVType::Time(time.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing time".to_string()),
                     },
                 },
             },
@@ -231,7 +231,7 @@ impl ByteString {
                     Ok(time) => return CSVType::Time(time.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing time".to_string()),
                     },
                 },
                 // hh:mm:ss && h:mm:ss
@@ -239,7 +239,7 @@ impl ByteString {
                     Ok(time) => return CSVType::Time(time.to_string()),
                     Err(_) => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing time".to_string()),
                     },
                 },
             },
@@ -262,7 +262,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -276,13 +276,13 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     }
                 },
                 18 => match datetime {
@@ -296,7 +296,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -307,7 +307,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yyyy hh:mm AM
@@ -320,13 +320,13 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 17 => match datetime {
@@ -337,7 +337,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yyyy h:mm AM
@@ -350,7 +350,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -361,7 +361,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/dd/yy hh:mm AM
@@ -380,7 +380,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -388,7 +388,7 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 16 => match datetime {
@@ -399,7 +399,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // yyyy/m/d h:mm AM
@@ -409,7 +409,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/dd/yy h:mm AM
@@ -428,7 +428,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -441,7 +441,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yy hh:mm AM
@@ -460,7 +460,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -468,7 +468,7 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 15 => match datetime {
@@ -479,7 +479,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yy h:mm AM
@@ -498,7 +498,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -506,12 +506,12 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
             _ => match datetime.len() {
@@ -526,7 +526,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -540,13 +540,13 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     }
                 },
                 15 => match datetime {
@@ -560,7 +560,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -571,7 +571,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yyyy hh:mm
@@ -584,13 +584,13 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 14 => match datetime {
@@ -601,7 +601,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yyyy h:mm
@@ -614,7 +614,7 @@ impl ByteString {
                             Ok(date) => return CSVType::DateTime(date.to_string()),
                             Err(_) => match self.s.parse::<String>() {
                                 Ok(s) => return CSVType::String(s),
-                                Err(e) => return CSVType::Error(e),
+                                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                             },
                         },
                     },
@@ -625,7 +625,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/dd/yy hh:mm
@@ -644,7 +644,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -652,7 +652,7 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 13 => match datetime {
@@ -663,7 +663,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // yyyy/m/d h:mm
@@ -673,7 +673,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/dd/yy h:mm
@@ -692,7 +692,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -705,7 +705,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yy hh:mm
@@ -724,7 +724,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -732,7 +732,7 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 12 => match datetime {
@@ -743,7 +743,7 @@ impl ByteString {
                         Ok(date) => return CSVType::DateTime(date.to_string()),
                         Err(_) => match self.s.parse::<String>() {
                             Ok(s) => return CSVType::String(s),
-                            Err(e) => return CSVType::Error(e),
+                            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                         },
                     },
                     // mm/d/yy h:mm
@@ -762,7 +762,7 @@ impl ByteString {
                                     Ok(date) => return CSVType::DateTime(date.to_string()),
                                     Err(_) => match self.s.parse::<String>() {
                                         Ok(s) => return CSVType::String(s),
-                                        Err(e) => return CSVType::Error(e),
+                                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                                     },
                                 },
                             },
@@ -770,12 +770,12 @@ impl ByteString {
                     },
                     _ => match self.s.parse::<String>() {
                         Ok(s) => return CSVType::String(s),
-                        Err(e) => return CSVType::Error(e),
+                        Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                     },
                 },
                 _ => match self.s.parse::<String>() {
                     Ok(s) => return CSVType::String(s),
-                    Err(e) => return CSVType::Error(e),
+                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing date".to_string()),
                 },
             },
         }
