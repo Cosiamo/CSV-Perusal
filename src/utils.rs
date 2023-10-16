@@ -1,4 +1,4 @@
-use crate::csvtype::ByteString;
+use crate::csvtype::{ByteString, CSVType};
 use regex::Regex;
 
 impl ByteString {
@@ -31,6 +31,13 @@ impl ByteString {
         .replace("₹", "")
         .replace("د.ك", "")
     }
+
+    pub fn convert_to_string(&self) -> CSVType {
+        match self.s.trim().parse::<String>() {
+            Ok(s) => return CSVType::String(s),
+            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
+        }
+    }
 }
 
 // all num matches
@@ -41,9 +48,9 @@ impl ByteString {
             || s.contains("/")
             => {
                 let date_regex = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$").unwrap();
-                match date_regex.captures(s) {
-                    Some(_) => true,
-                    None => false,
+                match date_regex.captures(&s).is_some() {
+                    true => true,
+                    false => false,
                 }
             },
             _ => false,
@@ -293,6 +300,21 @@ impl ByteString {
                         }
                     },
                 }
+            },
+            _ => false,
+        }
+    }
+
+    pub fn is_date_w_abbrv(&self) -> bool {
+        match self.s.trim().to_ascii_uppercase() {
+            s if s.contains("-")
+            || s.contains("/")
+            => {
+                let date_regex1 = Regex::new(r"^\d{2}-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\d{4}$").unwrap();
+                    match date_regex1.captures(&s).is_some() {
+                        true => true,
+                        false => false,
+                    }
             },
             _ => false,
         }

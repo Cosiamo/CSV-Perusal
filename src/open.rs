@@ -2,46 +2,35 @@ use crate::csvtype::{CSVType, ByteString};
 use std::{fs::File, path::Path, io::BufReader};
 
 pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
-    let mut outtervec: Vec<Vec<CSVType>> = Vec::new();
+    let mut outer_vec: Vec<Vec<CSVType>> = Vec::new();
 
     match csv_read(path) {
         Ok(data) => {
             for y in 0..data.len() {
-                let mut innervec: Vec<CSVType> = Vec::new();
+                let mut inner_vec: Vec<CSVType> = Vec::new();
                 for (_x, bytes) in data[y].iter().enumerate() {
                     match bytes {
-                        [] => innervec.push(CSVType::Empty), 
+                        [] => inner_vec.push(CSVType::Empty), 
                         _ => {
-                            match String::from_utf8((&bytes).to_vec()) {
-                                Ok(s) => match s.trim().parse::<i64>() {
-                                    Ok(v) => innervec.push(CSVType::Int(v)),
-                                    Err(_) => match s.trim().parse::<f64>() {
-                                        Ok(v) => innervec.push(CSVType::Float(v)),
-                                        Err(_) => innervec.push(match_catch(s))
-                                    },
-                                },
-                                Err(_) => {
-                                    let t = String::from_utf8_lossy(&bytes);
-                                    let s = t.replace(|c: char| !c.is_ascii(), "");
-                                    match s.trim().parse::<i64>() {
-                                        Ok(v) => innervec.push(CSVType::Int(v)),
-                                        Err(_) => match s.trim().parse::<f64>() {
-                                            Ok(v) => innervec.push(CSVType::Float(v)),
-                                            Err(_) => innervec.push(match_catch(s))
-                                        },
-                                    }
+                            let t = String::from_utf8_lossy(&bytes);
+                            let s = t.replace(|c: char| !c.is_ascii(), "");
+                            match s.trim().parse::<i64>() {
+                                Ok(v) => inner_vec.push(CSVType::Int(v)),
+                                Err(_) => match s.trim().parse::<f64>() {
+                                    Ok(v) => inner_vec.push(CSVType::Float(v)),
+                                    Err(_) => inner_vec.push(match_catch(s))
                                 },
                             }
                         }
                     }
                 }
-                outtervec.push(innervec)
+                outer_vec.push(inner_vec)
             }
         },
         Err(e) => return Err(e),
     };
 
-    Ok(outtervec)
+    Ok(outer_vec)
 }
 
 fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
@@ -71,70 +60,50 @@ fn match_catch(s: String) -> CSVType {
     match bytestring {
         bs if bs.is_empty() => return CSVType::Empty,
         bs if !bs.contains_number()
-        => match bs.s.parse::<String>() {
-            Ok(s) => return CSVType::String(s),
-            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
-        },
+        => return bs.convert_to_string(),
         bs if bs.trimmed().chars().all(char::is_numeric)
         => match bs {
             // checks for negative percent
             bs if bs.is_percent_neg()
             => match bs.remove_symbol().parse::<f64>() {
                 Ok(v) => return CSVType::Float(v),
-                Err(_) => match bs.s.parse::<String>() {
-                    Ok(s) => return CSVType::String(s),
-                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
-                },
+                Err(_) => return bs.convert_to_string(),
             },
             // checks for positive percent
             bs if bs.is_percent_pos()
             => match bs.remove_symbol().parse::<f64>() {
                 Ok(v) => return CSVType::Float(v),
-                Err(_) => match bs.s.parse::<String>() {
-                    Ok(s) => return CSVType::String(s),
-                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
-                },
+                Err(_) => return bs.convert_to_string(),
             },
             // checks for negative currency
             bs if bs.is_currency_neg()
             => match bs.remove_symbol().parse::<f64>() {
                 Ok(v) => return CSVType::Float(v),
-                Err(_) => match bs.s.parse::<String>() {
-                    Ok(s) => return CSVType::String(s),
-                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
-                },
+                Err(_) => return bs.convert_to_string(),
             },
             // checks for positive currency 
             bs if bs.is_currency_pos()
             => match bs.remove_symbol().parse::<f64>() {
                 Ok(v) => return CSVType::Float(v),
-                Err(_) => match bs.s.parse::<String>() {
-                    Ok(s) => return CSVType::String(s),
-                    Err(_) => return CSVType::Error("PARSING ERROR: Error parsing float".to_string()),
-                },
+                Err(_) => return bs.convert_to_string(),
             },
-            // checks for time
+            // checks for time 24h
             bs if bs.is_time_24h() => return bs.time_match(),
             // checks for date
             bs if bs.is_date() => return bs.date_match(),
             // catch
-            _ => match bs.s.parse::<String>() {
-                Ok(s) => {return CSVType::String(s)},
-                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
-            },
+            _ => return bs.convert_to_string(),
         },
         bs if bs.contains_number()
         => match bs {
+            // checks for time 12h
             bs if bs.is_time_12h() => return bs.time_match(),
+            // checks datetime
             bs if bs.is_datetime() => return bs.datetime_match(),
-            bs => match bs.s.parse::<String>() {
-                Ok(s) => return CSVType::String(s),
-                Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
-            },
+            // checks for date
+            bs if bs.is_date_w_abbrv() => return bs.date_w_abbrv_match(),
+            _ => return bs.convert_to_string(),
         },
-        _ => match bytestring.s.parse::<String>() {
-            Ok(s) => return CSVType::String(s),
-            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
-        },
+        _ => return bytestring.convert_to_string(),
     }
 }
