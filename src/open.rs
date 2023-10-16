@@ -69,6 +69,7 @@ fn match_catch(s: String) -> CSVType {
     let bytestring = ByteString {s};
 
     match bytestring {
+        bs if bs.is_empty() => return CSVType::Empty,
         bs if !bs.contains_number()
         => match bs.s.parse::<String>() {
             Ok(s) => return CSVType::String(s),

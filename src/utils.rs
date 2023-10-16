@@ -35,7 +35,6 @@ impl ByteString {
 
 // all num matches
 impl ByteString {
-
     pub fn is_date(&self) -> bool {
         match self.s.trim() {
             s if s.contains("-")
@@ -252,11 +251,16 @@ impl ByteString {
             _ => false,
         }
     }
-
 }
 
 // false num catch matches
 impl ByteString {
+    pub fn is_empty(&self) -> bool {
+        match self.s.trim().len() {
+            0 => true,
+            _ => false,
+        }
+    }
 
     pub fn contains_number(&self) -> bool {
         let v = self.s.trim().chars().map(|x| 
@@ -334,5 +338,4 @@ impl ByteString {
             _ => false,
         }
     }
-
 }
