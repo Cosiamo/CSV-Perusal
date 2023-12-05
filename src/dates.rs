@@ -2,7 +2,6 @@ use crate::csvtype::{CSVType, ByteString};
 use chrono::prelude::*;
 
 impl ByteString {
-
     pub fn date_match(&self) -> CSVType {
         let date = &self.s.replace("/", "-").replace(".", "-").trim().to_string();
         match date.len() {

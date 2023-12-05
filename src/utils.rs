@@ -1,5 +1,5 @@
-use crate::csvtype::{ByteString, CSVType};
-use regex::Regex;
+use crate::csvtype::{ByteString, CSVType, Byte};
+use memchr::memmem::Finder;
 
 impl ByteString {
     pub fn trimmed(&self) -> String {
@@ -42,41 +42,6 @@ impl ByteString {
 
 // all num matches
 impl ByteString {
-    pub fn is_date(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains("-")
-            || s.contains("/")
-            => {
-                let date_regex = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2}$").unwrap();
-                match date_regex.captures(&s).is_some() {
-                    true => true,
-                    false => false,
-                }
-            },
-            _ => false,
-        }
-    }
-
-    pub fn is_time_24h(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains(":")
-            => {
-                let hours_mins = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
-                match hours_mins.captures(s) {
-                    Some(_) => true,
-                    None => {
-                        let hours_mins_secs = Regex::new(r"^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
-                        match hours_mins_secs.captures(s) {
-                            Some(_) => true,
-                            None => false,
-                        }
-                    },
-                }
-            },
-            _ => false,
-        }
-    }
-
     pub fn is_percent_pos(&self) -> bool {
         match self.s.trim() {
             s if s.contains("%")
@@ -282,82 +247,92 @@ impl ByteString {
             _ => false,
         }
     }
+}
 
-    pub fn is_time_12h(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains(":")
-            && s.to_ascii_uppercase().contains("AM")
-            || s.to_ascii_uppercase().contains("PM")
-            => {
-                let hours_mins = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
-                match hours_mins.captures(s) {
-                    Some(_) => true,
-                    None => {
-                        let hours_mins_secs = Regex::new(r"^([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
-                        match hours_mins_secs.captures(s) {
-                            Some(_) => true,
-                            None => false
-                        }
-                    },
-                }
+// ++++++++++++++++++++++++++++++++ Either going to delete everything above or move it to it's own file ++++++++++++++++++++++++++++++++
+
+impl<'slice> Byte<'slice> {
+    pub fn is_dt(&self) -> bool {
+        Finder::new("/").find(&self.b).is_some()
+        || Finder::new("-").find(&self.b).is_some()
+        || Finder::new(":").find(&self.b).is_some()
+    }
+
+    pub fn num_match(&self) -> CSVType {
+        let t = String::from_utf8_lossy(&self.b);
+        let s = t.replace(|c: char| !c.is_ascii(), "");
+        match s.trim().parse::<i64>() {
+            Ok(v) => CSVType::Int(v),
+            Err(_) => match s.trim().parse::<f64>() {
+                Ok(v) => CSVType::Float(v),
+                Err(_) => self.catch()
             },
-            _ => false,
         }
     }
 
-    pub fn is_date_w_abbrv(&self) -> bool {
-        match self.s.trim().to_ascii_uppercase() {
-            s if s.contains("-")
-            || s.contains("/")
-            => {
-                let date_regex1 = Regex::new(r"^\d{2}-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-\d{4}$").unwrap();
-                    match date_regex1.captures(&s).is_some() {
-                        true => true,
-                        false => false,
-                    }
-            },
-            _ => false,
+    pub fn date_and_time(&self) -> CSVType {
+        let bytestring = ByteString {s: String::from_utf8_lossy(&self.b).replace(|c: char| !c.is_ascii(), "")};
+        match self {
+            by if by.is_time_24h() => return bytestring.time_match(),
+            by if by.is_time_12h() => return bytestring.time_match(),
+            by if by.is_datetime() => return bytestring.datetime_match(),
+            by if by.is_date() => return bytestring.date_match(),
+            _ => return self.catch(),
         }
     }
 
-    pub fn is_datetime(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains(":")
-            && s.contains("-")
-            || s.contains("/")
-            => {
-                match s {
-                    s if s.to_ascii_uppercase().contains("AM")
-                    || s.to_ascii_uppercase().contains("PM") 
-                    => {
-                        let h12 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9] ([AaPp][Mm])$").unwrap();
-                        match h12.captures(s) {
-                            Some(_) => true,
-                            None => {
-                                let h12_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([1-9]|0[1-9]|1[0-2]):[0-5][0-9]:[0-5][0-9] ([AaPp][Mm])$").unwrap();
-                                match h12_w_sec.captures(s) {
-                                    Some(_) => true,
-                                    None => false,
-                                }
-                            },
-                        }
-                    },
-                    _ => {
-                        let h24 = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]$").unwrap();
-                        match h24.captures(s) {
-                            Some(_) => true,
-                            None => {
-                                let h24_w_sec = Regex::new(r"^[0-3]?[0-9].[0-3]?[0-9].(?:[0-9]{2})?[0-9]{2} ([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$").unwrap();
-                                match h24_w_sec.captures(s) {
-                                    Some(_) => true,
-                                    None => false,
-                                }
-                            },
-                        }
-                    },
-                }
+    pub fn catch(&self) -> CSVType {
+        match_catch(&self.b)
+    }
+
+    pub fn am_pm(&self) -> bool {
+        Finder::new("AM").find(&self.b.to_ascii_uppercase()).is_some()
+        || Finder::new("PM").find(&self.b.to_ascii_uppercase()).is_some()
+    }
+}
+
+pub fn match_catch(bytes: &[u8]) -> CSVType {
+    let t = String::from_utf8_lossy(&bytes);
+    let s = t.replace(|c: char| !c.is_ascii(), "");
+    let bytestring = ByteString {s};
+
+    match bytestring {
+        bs if bs.is_empty() => return CSVType::Empty,
+        bs if !bs.contains_number()
+        => return bs.convert_to_string(),
+        bs if bs.trimmed().chars().all(char::is_numeric)
+        => match bs {
+            // checks for negative percent
+            bs if bs.is_percent_neg()
+            => match bs.remove_symbol().parse::<f64>() {
+                Ok(v) => return CSVType::Float(v),
+                Err(_) => return bs.convert_to_string(),
             },
-            _ => false,
-        }
+            // checks for positive percent
+            bs if bs.is_percent_pos()
+            => match bs.remove_symbol().parse::<f64>() {
+                Ok(v) => return CSVType::Float(v),
+                Err(_) => return bs.convert_to_string(),
+            },
+            // checks for negative currency
+            bs if bs.is_currency_neg()
+            => match bs.remove_symbol().parse::<f64>() {
+                Ok(v) => return CSVType::Float(v),
+                Err(_) => return bs.convert_to_string(),
+            },
+            // checks for positive currency 
+            bs if bs.is_currency_pos()
+            => match bs.remove_symbol().parse::<f64>() {
+                Ok(v) => return CSVType::Float(v),
+                Err(_) => return bs.convert_to_string(),
+            },
+            _ => return bs.convert_to_string(),
+        },
+        bs if bs.contains_number()
+        => match bs {
+            bs if bs.is_date_w_abbrv() => return bs.date_w_abbrv_match(),
+            _ => return bs.convert_to_string(),
+        },
+        _ => return bytestring.convert_to_string(),
     }
 }

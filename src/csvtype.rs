@@ -22,3 +22,7 @@ impl fmt::Display for CSVType {
 pub struct ByteString {
     pub(crate) s: String,
 }
+
+pub struct Byte<'slice> {
+    pub(crate) b: &'slice [u8],
+}
