@@ -4,18 +4,6 @@ A cargo crate that reads CSV files and returns the contents of the file with the
 
 CSV Perusal is built with uploading values from CSV files into relational databases in mind. The value returned when opening a CSV file is a 2D vector, with each inner vector acting as a different row.
 
-## Things to Know
-
-- Percentages and currency are converted into floats 
-- Times and dates are formatted by [Chrono](https://github.com/chronotope/chrono)
-    - It will attempt `mm/dd/yyyy` and `yyyy/mm/dd` formats first but will change to `dd/mm/yyyy` or `yyyy/dd/mm` if month value is greater than 12. Please be aware if you have dates in `dd/mm/yyyy` format, dates such as 2/11/2024 will be read as February 11th instead of November 2nd.
-    - Will output dates as `yyyy-mm-dd` but you can use the Chrono package to change the format
-    - Currently parses: `mm/dd/yyyy`, `dd/mm/yyyy`, `yyyy/mm/dd`, `yyyy/dd/mm`, `m/dd/yyyy`, `mm/d/yyyy`, `dd/m/yyyy`, `yyyy/mm/d`, `yyyy/dd/m`, `yyyy/m/dd`, `m/d/yyyy`, `yyyy/m/d`, `mm/dd/yy`, `dd/mm/yy`, `m/dd/yy`, `mm/d/yy`, `dd/m/yy`, `yy/m/dd`, `yy/mm/d`, `yy/dd/m`, `m/d/yy`, `yy/m/d` 
-- Time is in a 24 hour format but can also be changed to a 12 hour format with Chrono
-- The Error in the CSVType enumerator is `std::convert::Infallible` which is used when there's an issue parsing datatypes. The only other error is if the <i>path</i> for open_csv() is invalid.
-
-## Example
-
 CSV Perusal is very simple and easy to use. You only need to know one function and one enumerator. 
 The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which returns any of the following:
 - Int(i64)
@@ -26,6 +14,8 @@ The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which 
 - DateTime(String)
 - Error(String) <b><u>THIS IS TEMPORARY</u></b>
 - Empty
+
+## Example
 
 ```rust
 use csv_perusal::{open::open_csv, csvtype::CSVType};
@@ -76,3 +66,14 @@ INT: 2, FLOAT: 6.08, FLOAT: 90.1, DATE: "2023-02-07", DATETIME: "2023-11-04 01:5
 INT: 3, FLOAT: 6.44, FLOAT: 50.1, DATE: "2023-07-24", DATETIME: "2023-07-04 01:04:00", TIME: "12:32:00", TIME: "17:27:00",
 INT: 4, FLOAT: 4.99, FLOAT: 15.6, DATE: "2022-12-29", DATETIME: "2023-12-04 11:34:00", TIME: "17:17:00", TIME: "04:53:00",
 ```
+
+
+## Things to Know
+
+- Percentages and currency are converted into floats 
+- Times and dates are formatted by [Chrono](https://github.com/chronotope/chrono)
+    - It will attempt `mm/dd/yyyy` and `yyyy/mm/dd` formats first but will change to `dd/mm/yyyy` or `yyyy/dd/mm` if month value is greater than 12. Please be aware if you have dates in `dd/mm/yyyy` format, dates such as 2/11/2024 will be read as February 11th instead of November 2nd.
+    - Will output dates as `yyyy-mm-dd` but you can use the Chrono package to change the format
+    - Currently parses: `mm/dd/yyyy`, `dd/mm/yyyy`, `yyyy/mm/dd`, `yyyy/dd/mm`, `m/dd/yyyy`, `mm/d/yyyy`, `dd/m/yyyy`, `yyyy/mm/d`, `yyyy/dd/m`, `yyyy/m/dd`, `m/d/yyyy`, `yyyy/m/d`, `mm/dd/yy`, `dd/mm/yy`, `m/dd/yy`, `mm/d/yy`, `dd/m/yy`, `yy/m/dd`, `yy/mm/d`, `yy/dd/m`, `m/d/yy`, `yy/m/d` 
+- Time is in a 24 hour format but can also be changed to a 12 hour format with Chrono
+- The Error in the CSVType enumerator is `std::convert::Infallible` which is used when there's an issue parsing datatypes. The only other error is if the <i>path</i> for open_csv() is invalid.
