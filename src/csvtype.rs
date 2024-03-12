@@ -1,7 +1,7 @@
 use core::fmt;
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum CSVType {
     Int(i64),
     Float(f64),
