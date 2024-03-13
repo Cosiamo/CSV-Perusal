@@ -34,7 +34,7 @@ pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
     .sorted_by_key(|x| 
         match x[x.len() - 1] {
             CSVType::Int(v) => v,
-            _ => panic!("Not an index somehow"),
+            _ => panic!("Error: Row index didn't populate with an integer"),
         }
     )
     .collect::<Vec<Vec<CSVType>>>();
