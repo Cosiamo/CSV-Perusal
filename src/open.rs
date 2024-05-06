@@ -1,15 +1,20 @@
 use crate::{csvtype::{CSVType, Byte}, utils::match_catch};
 use std::{fs::File, path::Path, io::BufReader};
+use csv::ByteRecord;
 use rayon::prelude::*;
 use std::sync::mpsc::channel;
 use itertools::Itertools;
 
 pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
-    let mut data = match csv_read(path) {
+    let data = match csv_read(path) {
         Ok(data) => data,
         Err(e) => return Err(e),
     };
 
+    assign_byterecord(data)
+}
+
+pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, csv::Error> {
     let (sender, receiver) = channel();
     data.par_iter_mut().enumerate().for_each_with(sender, |s, (i, item)| {
         let mut inner_vec: Vec<CSVType> = Vec::new();

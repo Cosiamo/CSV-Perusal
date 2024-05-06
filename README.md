@@ -77,3 +77,179 @@ INT: 4, FLOAT: 4.99, FLOAT: 15.6, DATE: "2022-12-29", DATETIME: "2023-12-04 11:3
     - Currently parses: `mm/dd/yyyy`, `dd/mm/yyyy`, `yyyy/mm/dd`, `yyyy/dd/mm`, `m/dd/yyyy`, `mm/d/yyyy`, `dd/m/yyyy`, `yyyy/mm/d`, `yyyy/dd/m`, `yyyy/m/dd`, `m/d/yyyy`, `yyyy/m/d`, `mm/dd/yy`, `dd/mm/yy`, `m/dd/yy`, `mm/d/yy`, `dd/m/yy`, `yy/m/dd`, `yy/mm/d`, `yy/dd/m`, `m/d/yy`, `yy/m/d` 
 - Time is in a 24 hour format but can also be changed to a 12 hour format with Chrono
 - The Error in the CSVType enumerator is `std::convert::Infallible` which is used when there's an issue parsing datatypes. The only other error is if the <i>path</i> for open_csv() is invalid.
+
+
+
+
+------------------------------------------------------------------------------------
+
+# Faster Ways To Iterate and Assign Types to 2D Vectors
+
+I was recently thinking about a project I worked on a few months ago to reflect on the things I've learned about Rust since then. 
+One thing that I do a lot of for work is create and iterate over 2D vectors to filter data and assign the appropriate data types to values for our SQL data base. 
+So the project is a cargo crate that uses the CSV crate to open a CSV file then assigns data types to the values. 
+I was still relatively new to the language and wanted to get this task done quickly, so I did the simple thing and made nested for loops to get the values. 
+Nothing wrong with this approach, but as you'll see in the benchmarks, it isn't as fast as it could be.
+
+# Nested Regular For Loops
+```rust
+let mut outer_vec: Vec<Vec<CSVType>> = Vec::new();
+for y in 0..data.len() {
+    let mut inner_vec: Vec<CSVType> = Vec::new();
+    for bytes: &[u8] in data[y].iter() {
+        match bytes {
+            [] => inner_vec.push(CSVType::Empty),
+            _ => {
+                let byte: Byte<'_> = Byte{b: bytes};
+                match byte {
+                    byte if byte.is_number() => inner_vec.push(byte.num_match()),
+                    byte if byte.is_dt() => inner_vec.push(byte.date_and_time()),
+                    _ => inner_vec.push(match_catch(bytes)),
+                }
+            }
+        }
+    }
+    outer_vec.push(inner_vec);
+}
+
+Ok(outer_vec)
+```
+
+The first (and probably obvious) thing to do is to use the rayon crate to replace `.iter()` with `.par_mut_iter()` to iterate the data in parallel. 
+I also replaced the inner loop with `.for_each()` because I read that it some cases that it could be faster, however the performance didn't change.
+But, I do prefer this syntax, so I kept it.
+
+# Use Parallel Iteration and Replaced Outside Vector with Channels
+```rust
+let (sender, receiver) = channel();
+data.par_iter_mut().for_each_with(sender, |s, item| {
+    let mut inner_vec: Vec<CSVType> = Vec::new();
+    // item is a &ByteRecord and can't be iterated in parallel
+    item.iter().for_each(|bytes: &[u8]| {
+        match bytes {
+            [] => inner_vec.push(CSVType::Empty),
+            _ => {
+                let byte: Byte<'_> = Byte{b: bytes};
+                match byte {
+                    byte if byte.is_number() => inner_vec.push(byte.num_match()),
+                    byte if byte.is_dt() => inner_vec.push(byte.date_and_time()),
+                    _ => inner_vec.push(match_catch(bytes)),
+                }
+            }
+        }
+    });
+    s.send(inner_vec).unwrap();
+});
+
+let res = receiver.iter().collect::<Vec<Vec<CSVType>>>();
+Ok(res)
+```
+
+This approach did increase performance significantly, but the rows were all out of order, which could be a major problem if the header isn't received at index 0. 
+So I decided to enumerate the outer iteration, push it at the end of the inner vectors, sort them on that column once they're received, then pop it before the data gets returned.
+
+# Parallel Iteration with an Index
+```rust 
+let (sender, receiver) = channel();
+data.par_iter_mut().enumerate().for_each_with(sender, |s, (i, item)| {
+    let mut inner_vec: Vec<CSVType> = Vec::new();
+    item.iter().for_each(|bytes: &[u8]| {
+        match bytes {
+            [] => inner_vec.push(CSVType::Empty),
+            _ => {
+                let byte: Byte<'_> = Byte{b: bytes};
+                match byte {
+                    byte if byte.is_number() => inner_vec.push(byte.num_match()),
+                    byte if byte.is_dt() => inner_vec.push(byte.date_and_time()),
+                    _ => inner_vec.push(match_catch(bytes)),
+                }
+            }
+        }
+    });
+    inner_vec.push(CSVType::Int(i as i64));
+    s.send(inner_vec).unwrap();
+});
+
+let mut res = receiver.iter()
+    .sorted_by_key(|x| 
+        match x[x.len() - 1] {
+            CSVType::Int(v) => v,
+            _ => panic!("Error: Row index didn't populate with an integer"),
+        }
+    )
+    .collect::<Vec<Vec<CSVType>>>();
+
+for i in 0..res.len() { res[i].pop(); }
+
+Ok(res)
+```
+
+# Benchmarks
+
+For the benchmarks I used hyperfine and ran everything as `cargo run --release` with 1 warmup. 
+As you'll see, the parallel iterator is slower on very small datasets, but has massive performance gains as the size of the data increases. 
+I believe that's because it takes longer to create the channels and pass the data through the threads than initialize a few vectors, but I'm not entirely sure.
+
+## 10 Rows
+
+#### Nested For Loop
+```
+  Time (mean ± σ):     106.1 ms ±   8.6 ms    [User: 11.7 ms, System: 8.4 ms]
+  Range (min … max):    95.2 ms … 141.0 ms    100 runs
+```
+
+#### Parallel Iteration
+```
+  Time (mean ± σ):     117.1 ms ±  11.0 ms    [User: 11.1 ms, System: 8.8 ms]
+  Range (min … max):    99.4 ms … 144.7 ms    100 runs
+```
+
+#### Parallel Iteration with Index
+```
+  Time (mean ± σ):     112.9 ms ±  10.1 ms    [User: 7.5 ms, System: 8.9 ms]
+  Range (min … max):    98.2 ms … 140.5 ms    100 runs
+```
+
+-------------------------------
+
+## 16,000 Rows
+
+#### Nested For Loop
+```
+  Time (mean ± σ):     281.3 ms ±  12.5 ms    [User: 151.2 ms, System: 15.5 ms]
+  Range (min … max):   258.7 ms … 338.2 ms    100 runs
+```
+
+#### Parallel Iteration
+```
+  Time (mean ± σ):     171.4 ms ±  10.2 ms    [User: 335.2 ms, System: 11.2 ms]
+  Range (min … max):   153.3 ms … 198.4 ms    100 runs
+```
+
+#### Parallel Iteration with Index
+```
+  Time (mean ± σ):     176.1 ms ±  12.2 ms    [User: 345.8 ms, System: 9.9 ms]
+  Range (min … max):   155.5 ms … 230.7 ms    100 runs
+```
+
+-------------------------------
+
+## 1.24 Million Rows
+
+#### Nested For Loop
+```
+  Time (mean ± σ):     12.910 s ±  1.561 s    [User: 7.767 s, System: 0.312 s]
+  Range (min … max):   11.090 s … 15.813 s    10 runs
+```
+
+#### Parallel Iteration
+```
+  Time (mean ± σ):      3.894 s ±  0.166 s    [User: 30.308 s, System: 0.670 s]
+  Range (min … max):    3.663 s …  4.191 s    10 runs
+```
+
+#### Parallel Iteration with Index
+```
+  Time (mean ± σ):      4.352 s ±  0.112 s    [User: 31.134 s, System: 0.664 s]
+  Range (min … max):    4.190 s …  4.539 s    10 runs
+```
