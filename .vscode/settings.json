@@ -1,8 +1,12 @@
 {
     "cSpell.words": [
+        "abbrv",
         "bytemuck",
         "byterecord",
         "bytestring",
-        "datetime"
+        "chrono",
+        "csvtype",
+        "datetime",
+        "Itertools"
     ]
 }

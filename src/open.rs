@@ -1,4 +1,4 @@
-use crate::{csvtype::{CSVType, Byte}, utils::match_catch};
+use crate::{numbers::utils::match_catch, Byte, CSVType};
 use std::{fs::File, path::Path, io::BufReader};
 use csv::ByteRecord;
 use rayon::prelude::*;
