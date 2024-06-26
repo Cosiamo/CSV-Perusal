@@ -1,4 +1,4 @@
-use crate::ByteString;
+use crate::types::ByteString;
 
 impl ByteString {
     pub fn is_currency_pos(&self) -> bool {

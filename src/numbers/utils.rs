@@ -1,4 +1,4 @@
-use crate::{Byte, ByteString, CSVType};
+use crate::{types::{Byte, ByteString}, CSVType};
 
 impl<'slice> Byte<'slice> {
     pub fn num_match(&self) -> CSVType {

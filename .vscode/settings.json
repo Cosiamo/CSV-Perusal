@@ -7,6 +7,7 @@
         "chrono",
         "csvtype",
         "datetime",
-        "Itertools"
+        "Itertools",
+        "thiserror"
     ]
 }

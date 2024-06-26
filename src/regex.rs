@@ -1,7 +1,7 @@
 use regex::bytes::Regex;
 use once_cell::sync::Lazy;
 
-use crate::{Byte, ByteString};
+use crate::types::{Byte, ByteString};
 
 // is_date
 static DATE: Lazy<Regex> = Lazy::new(|| {

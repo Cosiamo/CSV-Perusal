@@ -1,4 +1,4 @@
-use crate::{Byte, ByteString, CSVType};
+use crate::{types::{Byte, ByteString}, CSVType};
 use memchr::memmem::Finder;
 
 impl<'slice> Byte<'slice> {
@@ -11,8 +11,7 @@ impl<'slice> Byte<'slice> {
     pub fn date_and_time(&self) -> CSVType {
         let bytestring = ByteString {s: String::from_utf8_lossy(&self.b).replace(|c: char| !c.is_ascii(), "")};
         match self {
-            by if by.is_time_24h() => return bytestring.time_match(),
-            by if by.is_time_12h() => return bytestring.time_match(),
+            by if by.is_time_24h() || by.is_time_12h() => return bytestring.time_match(),
             by if by.is_datetime() => return bytestring.datetime_match(),
             by if by.is_date() => return bytestring.date_match(),
             _ => return self.catch(),

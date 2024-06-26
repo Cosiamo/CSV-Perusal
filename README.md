@@ -9,42 +9,37 @@ The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which 
 - Int(i64)
 - Float(f64)
 - String(String)
-- Date(String)
-- Time(String)
-- DateTime(String)
-- Error(String) <b><u>THIS IS TEMPORARY</u></b>
+- Date(NaiveDate),
+- Time(NaiveTime),
+- DateTime(NaiveDateTime),
+- Error(CellError)
 - Empty
 
 ## Example
 
 ```rust
-use csv_perusal::{open::open_csv, CSVType};
+use csv_perusal::{open_csv, CSVType};
 
 fn main() {
-    let path = "test_data/MOCK_DATA.csv";
-
+    let path = "test_data/DATA10ROWS.csv";
     let data = open_csv(path).unwrap();
 
-    for (y, row) in data.iter().enumerate() {
-        for cell in row.iter() {
+    data.iter().for_each(|row| {
+        row.iter().for_each(|cell|{
             match cell {
-                CSVType::Int(val) => print!("INT: {:?}, ", val),
-                CSVType::Float(val) => print!("FLOAT: {:?}, ", val),
-                CSVType::String(val) => print!("STRING: {:?}, ", val),
-                CSVType::Date(val) => print!("DATE: {:?}, ", val),
-                CSVType::Time(val) => print!("TIME: {:?}, ", val),
-                CSVType::DateTime(val) => print!("DATETIME: {:?}, ", val),
-                CSVType::Error(e) => panic!("++++++++++++++ERROR++++++++++++++ {:?}", e),
+                CSVType::Int(val) => print!("INT:{:?}, ", val),
+                CSVType::Float(val) => print!("FLOAT:{:?}, ", val),
+                CSVType::String(val) => print!("STRING:{:?}, ", val),
+                CSVType::Date(val) => print!("DATE:{:?}, ", val),
+                CSVType::Time(val) => print!("TIME:{:?}, ", val),
+                CSVType::DateTime(val) => print!("DATETIME:{:?}, ", val),
+                CSVType::Error(e) => print!("ERROR:{:?}", e),
                 CSVType::Empty => print!("NONE, "),
             }
-        }
+        });
         print!("\n");
-        if y == 0 {
-            println!("-----------------------------");
-        }
-    }
+    });
 }
-
 ```
 
 ### Input

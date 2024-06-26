@@ -1,20 +1,11 @@
-use crate::{numbers::utils::match_catch, Byte, CSVType};
+use crate::{error::CSVPerusalError, numbers::utils::match_catch, types::Byte, CSVType};
 use std::{fs::File, path::Path, io::BufReader};
 use csv::ByteRecord;
 use rayon::prelude::*;
 use std::sync::mpsc::channel;
 use itertools::Itertools;
 
-pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, csv::Error> {
-    let data = match csv_read(path) {
-        Ok(data) => data,
-        Err(e) => return Err(e),
-    };
-
-    assign_byterecord(data)
-}
-
-pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, csv::Error> {
+pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     let (sender, receiver) = channel();
     data.par_iter_mut().enumerate().for_each_with(sender, |s, (i, item)| {
         let mut inner_vec: Vec<CSVType> = Vec::new();
@@ -50,7 +41,7 @@ pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>,
 }
 
 
-fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
+pub fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, CSVPerusalError> {
     match File::open(Path::new(&path)) {
         Ok(file_handle) => {
             let reader = BufReader::new(file_handle);
@@ -62,11 +53,11 @@ fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, csv::Error> {
             for result in rdr.byte_records() {
                 match result {
                     Ok(record) => data.push(record),
-                    Err(e) => return Err(e),
+                    Err(e) => return Err(CSVPerusalError::FileError(e)),
                 };
             }
             return Ok(data)
         },
-        Err(e) => return Err(e.into()),
+        Err(e) => return Err(CSVPerusalError::IOError(e)),
     };
 }

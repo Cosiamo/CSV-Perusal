@@ -1,6 +1,6 @@
 use chrono::NaiveTime;
 
-use crate::{ByteString, CSVType};
+use crate::{types::ByteString, CSVType};
 
 impl ByteString {
     pub fn time_match(&self) -> CSVType {

@@ -1,4 +1,4 @@
-use crate::{ByteString, CSVType};
+use crate::{error::CellError, types::ByteString, CSVType};
 
 pub mod currency;
 pub mod percent;
@@ -38,7 +38,7 @@ impl ByteString {
     pub fn convert_to_string(&self) -> CSVType {
         match self.s.trim().parse::<String>() {
             Ok(s) => return CSVType::String(s),
-            Err(_) => return CSVType::Error("PARSING ERROR: Error parsing string".to_string()),
+            Err(_) => return CSVType::Error(CellError::DataParseError),
         }
     }
     

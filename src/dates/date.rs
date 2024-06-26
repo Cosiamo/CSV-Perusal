@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::{ByteString, CSVType};
+use crate::{types::ByteString, CSVType};
 
 impl ByteString {
     pub fn date_match(&self) -> CSVType {
