@@ -2,18 +2,9 @@
 
 A cargo crate that reads CSV files and returns the contents of the file with the appropriate datatype. Inspired by [Calamine](https://github.com/tafia/calamine/tree/master), this package aims to make dealing with CSV files easier. 
 
-CSV Perusal is built with uploading values from CSV files into relational databases in mind. The value returned when opening a CSV file is a 2D vector, with each inner vector acting as a different row.
+CSV Perusal is built with uploading values from CSV files into relational databases in mind. The value returned when opening a CSV file is a two-dimensional vector of the `CSVType` enumerator, with each inner vector acting as a different row.
 
-CSV Perusal is very simple and easy to use. You only need to know one function and one enumerator. 
-The `open_csv()` function returns a 2d vector of the `CSVType` enumerator which returns any of the following:
-- Int(i64)
-- Float(f64)
-- String(String)
-- Date(NaiveDate),
-- Time(NaiveTime),
-- DateTime(NaiveDateTime),
-- Error(CellError)
-- Empty
+CSV Perusal is very simple and easy to use. If you have a file path and just want the values parsed, `open_csv()` is what you're looking for. If you have a particular way you want to open a CSV file with the [`csv`](https://docs.rs/csv/latest/csv/) crate and have a vector of [`ByteRecords`](https://docs.rs/csv/latest/csv/struct.ByteRecord.html), or have a two-dimensional vector of a `String` or `&str`, then you'll want to use the method `get_csv_types()`.
 
 ## Example
 
@@ -22,10 +13,10 @@ use csv_perusal::{open_csv, CSVType};
 
 fn main() {
     let path = "test_data/DATA10ROWS.csv";
-    let data = open_csv(path).unwrap();
+    let grid = open_csv(path).unwrap();
 
-    data.iter().for_each(|row| {
-        row.iter().for_each(|cell|{
+    grid.iter().for_each(|row| {
+        row.iter().for_each(|cell| {
             match cell {
                 CSVType::Int(val) => print!("INT:{:?}, ", val),
                 CSVType::Float(val) => print!("FLOAT:{:?}, ", val),
