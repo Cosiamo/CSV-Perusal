@@ -1,4 +1,4 @@
-use crate::{error::CellError, types::ByteString, CSVType};
+use crate::{errors::CellError, types::ByteString, CSVType};
 
 pub mod currency;
 pub mod percent;

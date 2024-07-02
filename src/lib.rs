@@ -1,13 +1,15 @@
+#![doc = include_str!("../README.md")]
+
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use error::{CSVPerusalError, CellError};
 use serde::{Serialize, Deserialize};
 use csv::{ByteRecord, ReaderBuilder};
-use open::{assign_byterecord, csv_read};
+use open::{assign_bytes, csv_read};
+use errors::{CSVPerusalError, CellError};
 use core::fmt;
 
-pub mod error;
-pub mod vector_to_byterecord;
-pub(crate) mod open;
+pub mod errors;
+pub mod utils;
+pub mod open;
 pub(crate) mod dates;
 pub(crate) mod regex;
 pub(crate) mod numbers;
@@ -34,8 +36,7 @@ impl fmt::Display for CSVType {
     }
 }
 
-/// Input the file path to a CSV file you want parsed. 
-/// It will return a two-dimensional vector of [`CSVType`].
+/// Input the file path to a CSV file you want parsed and it will return a two-dimensional vector of [`CSVType`].
 /// 
 /// # Example
 /// 
@@ -55,7 +56,7 @@ impl fmt::Display for CSVType {
 ///                CSVType::Date(val) => print!("DATE:{:?},", val),
 ///                CSVType::Time(val) => print!("TIME:{:?},", val),
 ///                CSVType::DateTime(val) => print!("DATETIME:{:?},", val),
-///                CSVType::Error(e) => print!("ERROR:{:?},", e),
+///                CSVType::Error(err) => print!("ERROR:{:?},", err),
 ///                CSVType::Empty => print!("NONE,"),
 ///            }
 ///        });
@@ -68,29 +69,45 @@ pub fn open_csv(path: &str) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     byte_records.get_csv_types()
 }
 
+/// Contains the method for converting grid data to [`CSVType`].
 pub trait ParseSeparatedValues {
+    /// A required method that converts grid data into a two-dimensional vector of [`CSVType`].
+    /// 
+    /// # How to Implement
+    /// 
+    /// ```rust 
+    /// impl ParseSeparatedValues for Vec<Vec<MyCustomEnum>> {
+    ///     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
+    ///         // Make sure your input datatype can convert to a string.
+    ///         // [`utils::grid_to_byterecord!`] will convert your grid data into Vec<[`csv::ByteRecord`]>.
+    ///         let byte_records = grid_to_byterecord!(self);
+    ///         // Converts Vec<[`csv::ByteRecord`]> to Vec<Vec<[`CSVType`]>>
+    ///         assign_bytes(byte_records)
+    ///     }
+    /// }
+    /// ```
     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError>;
 }
 
 impl ParseSeparatedValues for Vec<ByteRecord> {
     /// Organizes [`csv::ByteRecord`] into specific data types via the [`CSVType`] struct.
     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
-        assign_byterecord(self)
+        assign_bytes(self)
     }
 }
 
 impl ParseSeparatedValues for Vec<Vec<String>> {
     /// Organizes two-dimensional [`String`] vector into specific data types via the [`CSVType`] struct.
     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
-        let byte_records = vector_to_byterecord!(self);
-        assign_byterecord(byte_records)
+        let byte_records = grid_to_byterecord!(self);
+        assign_bytes(byte_records)
     }
 }
 
 impl ParseSeparatedValues for Vec<Vec<&str>> {
     /// Organizes two-dimensional [`str`] vector into specific data types via the [`CSVType`] struct.
     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
-        let byte_records = vector_to_byterecord!(self);
-        assign_byterecord(byte_records)
+        let byte_records = grid_to_byterecord!(self);
+        assign_bytes(byte_records)
     }
 }

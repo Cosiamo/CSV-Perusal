@@ -24,7 +24,7 @@ fn main() {
                 CSVType::Date(val) => print!("DATE:{:?}, ", val),
                 CSVType::Time(val) => print!("TIME:{:?}, ", val),
                 CSVType::DateTime(val) => print!("DATETIME:{:?}, ", val),
-                CSVType::Error(e) => print!("ERROR:{:?}", e),
+                CSVType::Error(err) => print!("ERROR:{:?}", err),
                 CSVType::Empty => print!("NONE, "),
             }
         });

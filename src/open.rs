@@ -1,11 +1,14 @@
-use crate::{error::CSVPerusalError, numbers::utils::match_catch, types::Byte, CSVType};
+use crate::{errors::CSVPerusalError, numbers::utils::match_catch, types::Byte, CSVType};
 use std::{fs::File, path::Path, io::BufReader};
 use csv::ByteRecord;
 use rayon::prelude::*;
 use std::sync::mpsc::channel;
 use itertools::Itertools;
 
-pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
+/// Assigns the bytes from a vector of [`csv::ByteRecord`] to a specific [`CSVType`].
+/// 
+/// Uses parallel iteration via [`rayon`] to double the speed of iteration of the input data.
+pub fn assign_bytes(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     let (sender, receiver) = channel();
     data.par_iter_mut().enumerate().for_each_with(sender, |send, (idx, item)| {
         let mut inner_vec: Vec<CSVType> = Vec::new();
@@ -40,7 +43,7 @@ pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>,
     Ok(res)
 }
 
-
+/// Opens a csv file and extract the contents as a vector of [`csv::ByteRecord`].
 pub fn csv_read(path: &str) -> Result<Vec<csv::ByteRecord>, CSVPerusalError> {
     match File::open(Path::new(&path)) {
         Ok(file_handle) => {
