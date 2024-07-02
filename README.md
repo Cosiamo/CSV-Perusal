@@ -12,7 +12,7 @@ CSV Perusal is very simple and easy to use. If you have a file path and just wan
 use csv_perusal::{open_csv, CSVType};
 
 fn main() {
-    let path = "test_data/DATA10ROWS.csv";
+    let path = "test_data/MOCK_DATA.csv";
     let grid = open_csv(path).unwrap();
 
     grid.iter().for_each(|row| {
