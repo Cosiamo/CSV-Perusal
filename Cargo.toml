@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/Cosiamo/CSV-Perusal"
 keywords = ["csv", "parser", "reader", "datatype", "data"]
 categories = ["data-structures", "development-tools", "template-engine", "encoding", "parsing"]
-exclude = ["main.rs", ".vscode/*", ".gitignore"]
+exclude = ["main.rs", ".vscode/*", ".gitignore", ".idea/"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
