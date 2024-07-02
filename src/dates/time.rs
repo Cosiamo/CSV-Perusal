@@ -20,7 +20,7 @@ impl ByteString {
                     Err(_) => return self.convert_to_string(),
                 },
             },
-            string_to_time =>  match string_to_time {
+            military =>  match military {
                 // hh:mm && h:mm
                 string_to_time if string_to_time.len() < 6
                 => match NaiveTime::parse_from_str(&*self.bytestring, "%H:%M") {
