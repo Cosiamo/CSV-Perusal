@@ -4,11 +4,16 @@ use crate::{types::ByteString, CSVType};
 
 impl ByteString {
     pub fn datetime_match(&self) -> CSVType {
-        let datetime = &self.s.replace("/", "-").replace(".", "-").trim().to_string();
-        match datetime {
-            dt if dt.to_ascii_uppercase().contains("AM") || dt.to_ascii_uppercase().contains("PM")
-            => match datetime.len() {
-                19 => match datetime {
+        let string = &self.bytestring
+            .replace("/", "-")
+            .replace(".", "-")
+            .trim()
+            .to_string();
+        match string {
+            datetime if datetime.to_ascii_uppercase().contains("AM") 
+            || datetime.to_ascii_uppercase().contains("PM")
+            => match string.len() {
+                19 => match string {
                     // mm/dd/yyyy hh:mm AM
                     dt if &dt[13..14] == ":"
                     && &dt[2..3] == "-" && &dt[5..6] == "-" 
@@ -33,7 +38,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                18 => match datetime {
+                18 => match string {
                     // mm/dd/yyyy h:mm AM
                     dt if &dt[12..13] == ":"
                     && &dt[2..3] == "-" && &dt[5..6] == "-" 
@@ -65,7 +70,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                17 => match datetime {
+                17 => match string {
                     // m/dd/yyyy h:mm AM
                     dt if &dt[11..12] == ":"
                     && &dt[1..2] == "-" && &dt[4..5] == "-" 
@@ -112,7 +117,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                16 => match datetime {
+                16 => match string {
                     // m/d/yyyy h:mm AM
                     dt if &dt[10..11] == ":"
                     && &dt[1..2] == "-" && &dt[3..4] == "-" 
@@ -174,7 +179,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                15 => match datetime {
+                15 => match string {
                     // m/dd/yy h:mm AM
                     dt if &dt[9..10] == ":"
                     && &dt[1..2] == "-" && &dt[4..5] == "-" 
@@ -205,8 +210,8 @@ impl ByteString {
                 },
                 _ => return self.convert_to_string(),
             },
-            _ => match datetime.len() {
-                16 => match datetime {
+            _ => match string.len() {
+                16 => match string {
                     // mm/dd/yyyy hh:mm
                     dt if &dt[13..14] == ":"
                     && &dt[2..3] == "-" && &dt[5..6] == "-" 
@@ -231,7 +236,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                15 => match datetime {
+                15 => match string {
                     // mm/dd/yyyy h:mm
                     dt if &dt[12..13] == ":"
                     && &dt[2..3] == "-" && &dt[5..6] == "-" 
@@ -263,7 +268,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                14 => match datetime {
+                14 => match string {
                     // m/dd/yyyy h:mm
                     dt if &dt[11..12] == ":"
                     && &dt[1..2] == "-" && &dt[4..5] == "-" 
@@ -310,7 +315,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                13 => match datetime {
+                13 => match string {
                     // m/d/yyyy h:mm
                     dt if &dt[10..11] == ":"
                     && &dt[1..2] == "-" && &dt[3..4] == "-" 
@@ -372,7 +377,7 @@ impl ByteString {
                     },
                     _ => return self.convert_to_string(),
                 },
-                12 => match datetime {
+                12 => match string {
                     // m/dd/yy h:mm
                     dt if &dt[9..10] == ":"
                     && &dt[1..2] == "-" && &dt[4..5] == "-" 

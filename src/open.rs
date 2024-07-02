@@ -7,13 +7,13 @@ use itertools::Itertools;
 
 pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     let (sender, receiver) = channel();
-    data.par_iter_mut().enumerate().for_each_with(sender, |s, (i, item)| {
+    data.par_iter_mut().enumerate().for_each_with(sender, |send, (idx, item)| {
         let mut inner_vec: Vec<CSVType> = Vec::new();
         item.iter().for_each(|bytes: &[u8]| {
             match bytes {
                 [] => inner_vec.push(CSVType::Empty),
                 _ => {
-                    let byte: Byte<'_> = Byte{b: bytes};
+                    let byte: Byte<'_> = Byte{byte: bytes};
                     match byte {
                         byte if byte.is_number() => inner_vec.push(byte.num_match()),
                         byte if byte.is_dt()=> inner_vec.push(byte.date_and_time()),
@@ -22,20 +22,20 @@ pub fn assign_byterecord(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>,
                 }
             }
         });
-        inner_vec.push(CSVType::Int(i as i64));
-        s.send(inner_vec).unwrap();
+        inner_vec.push(CSVType::Int(idx as i64));
+        send.send(inner_vec).unwrap();
     });
 
     let mut res = receiver.iter()
-    .sorted_by_key(|x| 
-        match x[x.len() - 1] {
-            CSVType::Int(v) => v,
-            _ => panic!("Error: Row index didn't populate with an integer"),
-        }
-    )
-    .collect::<Vec<Vec<CSVType>>>();
+        .sorted_by_key(|row| 
+            match row[row.len() - 1] {
+                CSVType::Int(val) => val,
+                _ => panic!("Error: Row index didn't populate with an integer"),
+            }
+        )
+        .collect::<Vec<Vec<CSVType>>>();
 
-    for r in 0..res.len() { res[r].pop(); }
+    for received in 0..res.len() { res[received].pop(); }
 
     Ok(res)
 }

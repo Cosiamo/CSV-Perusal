@@ -6,44 +6,46 @@ pub mod utils;
 
 impl ByteString {
     pub fn trimmed(&self) -> String {
-        return self.s.trim()
-        .replace("%", "")
-        .replace(",", "")
-        .replace(".", "")
-        .replace("-", "")
-        .replace("/", "")
-        .replace(":", "")
-        .replace("$", "")
-        .replace("€", "")
-        .replace("£", "")
-        .replace("¥", "")
-        .replace("₣", "")
-        .replace("₹", "")
-        .replace("د.ك", "")
+        return self.bytestring
+            .trim()
+            .replace("%", "")
+            .replace(",", "")
+            .replace(".", "")
+            .replace("-", "")
+            .replace("/", "")
+            .replace(":", "")
+            .replace("$", "")
+            .replace("€", "")
+            .replace("£", "")
+            .replace("¥", "")
+            .replace("₣", "")
+            .replace("₹", "")
+            .replace("د.ك", "")
     }
 
     pub fn remove_symbol(&self) -> String {
-        return self.s.trim()
-        .replace(",", "")
-        .replace("%", "")
-        .replace("$", "")
-        .replace("€", "")
-        .replace("£", "")
-        .replace("¥", "")
-        .replace("₣", "")
-        .replace("₹", "")
-        .replace("د.ك", "")
+        return self.bytestring
+            .trim()
+            .replace(",", "")
+            .replace("%", "")
+            .replace("$", "")
+            .replace("€", "")
+            .replace("£", "")
+            .replace("¥", "")
+            .replace("₣", "")
+            .replace("₹", "")
+            .replace("د.ك", "")
     }
 
     pub fn convert_to_string(&self) -> CSVType {
-        match self.s.trim().parse::<String>() {
-            Ok(s) => return CSVType::String(s),
+        match self.bytestring.trim().parse::<String>() {
+            Ok(string) => return CSVType::String(string),
             Err(_) => return CSVType::Error(CellError::DataParseError),
         }
     }
     
     pub fn is_empty(&self) -> bool {
-        match self.s.trim().len() {
+        match self.bytestring.trim().len() {
             0 => true,
             _ => false,
         }
@@ -51,15 +53,15 @@ impl ByteString {
 
     // false num catch matches
     pub fn contains_number(&self) -> bool {
-        let v = self.s.trim().chars().map(|x| 
-            match x {
-                x if x.is_numeric() => true,
+        let vector = self.bytestring.trim().chars().map(|char| 
+            match char {
+                local_char if local_char.is_numeric() => true,
                 _ => false,
             }
         ).collect::<Vec<bool>>();
 
-        match v {
-            v if v.contains(&true) => true,
+        match vector {
+            local_vector if local_vector.contains(&true) => true,
             _ => false,
         }
     }

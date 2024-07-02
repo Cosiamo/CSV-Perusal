@@ -2,16 +2,16 @@ use crate::types::ByteString;
 
 impl ByteString {
     pub fn is_currency_pos(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains("$")
-            || s.contains("€")
-            || s.contains("£")
-            || s.contains("¥")
-            || s.contains("₣")
-            || s.contains("₹")
-            || s.contains("د.ك")
+        match self.bytestring.trim() {
+            string if string.contains("$")
+            || string.contains("€")
+            || string.contains("£")
+            || string.contains("¥")
+            || string.contains("₣")
+            || string.contains("₹")
+            || string.contains("د.ك")
             => {
-                match s.chars().map(|x| x).collect::<Vec<char>>() {
+                match string.chars().map(|x| x).collect::<Vec<char>>() {
                     // $
                     chars if chars[0] == "$".chars().map(|x| x).collect::<Vec<char>>()[0] 
                     => true,
@@ -62,17 +62,17 @@ impl ByteString {
     }
 
     pub fn is_currency_neg(&self) -> bool {
-        match self.s.trim() {
-            s if s.contains("-")
-            && s.contains("$")
-            || s.contains("€")
-            || s.contains("£")
-            || s.contains("¥")
-            || s.contains("₣")
-            || s.contains("₹")
-            || s.contains("د.ك")
+        match self.bytestring.trim() {
+            string if string.contains("-")
+            && string.contains("$")
+            || string.contains("€")
+            || string.contains("£")
+            || string.contains("¥")
+            || string.contains("₣")
+            || string.contains("₹")
+            || string.contains("د.ك")
             => {
-                match s.chars().map(|x| x).collect::<Vec<char>>() {
+                match string.chars().map(|x| x).collect::<Vec<char>>() {
                     // $
                     chars if chars.contains(&"$".chars().map(|x| x).collect::<Vec<char>>()[0]) 
                     && chars[0] == "-".chars().map(|x| x).collect::<Vec<_>>()[0] 

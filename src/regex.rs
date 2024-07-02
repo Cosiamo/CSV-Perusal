@@ -41,41 +41,41 @@ static NUM: Lazy<Regex> = Lazy::new(|| {
 
 impl<'slice> Byte<'slice> {
     pub fn is_date(&self) -> bool {
-        DATE.captures(&self.b).is_some()
+        DATE.captures(&self.byte).is_some()
     }
 
     pub fn is_datetime(&self) -> bool {
         match self.am_pm() {
-            true => match DT12.captures(&self.b) {
+            true => match DT12.captures(&self.byte) {
                 Some(_) => true,
-                None => DT12_W_S.captures(&self.b).is_some(),
+                None => DT12_W_S.captures(&self.byte).is_some(),
             },
-            false => match DT24.captures(&self.b) {
+            false => match DT24.captures(&self.byte) {
                 Some(_) => true,
-                None => DT24_W_S.captures(&self.b).is_some(),
+                None => DT24_W_S.captures(&self.byte).is_some(),
             }
         }
     }
 
     pub fn is_time_24h(&self) -> bool {
-        match H24.captures(&self.b) {
+        match H24.captures(&self.byte) {
             Some(_) => true,
-            None => H24_W_S.captures(&self.b).is_some(),
+            None => H24_W_S.captures(&self.byte).is_some(),
         }
     }
 
     pub fn is_time_12h(&self) -> bool {
         match self.am_pm() {
-            true => match H12.captures(&self.b) {
+            true => match H12.captures(&self.byte) {
                 Some(_) => true,
-                None => H12_W_S.captures(&self.b).is_some(),
+                None => H12_W_S.captures(&self.byte).is_some(),
             },
             false => false,
         }
     }
 
     pub fn is_number(&self) -> bool {
-        NUM.captures(&self.b).is_some()
+        NUM.captures(&self.byte).is_some()
     }
 }
 
@@ -86,10 +86,10 @@ static DATE_W_ABBRV: Lazy<regex::Regex> = Lazy::new(|| {
 
 impl ByteString {
     pub fn is_date_w_abbrv(&self) -> bool {
-        match self.s.trim().to_ascii_uppercase() {
-            s if s.contains("-")
-            || s.contains("/")
-            => DATE_W_ABBRV.captures(&s).is_some(),
+        match self.bytestring.trim().to_ascii_uppercase() {
+            string if string.contains("-")
+            || string.contains("/")
+            => DATE_W_ABBRV.captures(&string).is_some(),
             _ => false,
         }
     }

@@ -5,13 +5,13 @@ use csv::{ByteRecord, ReaderBuilder};
 use open::{assign_byterecord, csv_read};
 use core::fmt;
 
-pub mod open;
-pub mod dates;
-pub mod regex;
-pub mod numbers;
 pub mod error;
-pub mod types;
 pub mod vector_to_byterecord;
+pub(crate) mod open;
+pub(crate) mod dates;
+pub(crate) mod regex;
+pub(crate) mod numbers;
+pub(crate) mod types;
 
 /// `CSVType` is the organized the data from [`csv::ByteRecord`]. 
 /// It's meant to make the generic output data from the [`csv`] package easier to work with by giving each cell a specific data type. 
@@ -29,8 +29,8 @@ pub enum CSVType {
 }
 
 impl fmt::Display for CSVType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Debug::fmt(self, f)
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, fmt)
     }
 }
 
@@ -47,7 +47,7 @@ impl fmt::Display for CSVType {
 ///     let data = open_csv(path).unwrap();
 /// 
 ///     data.iter().for_each(|row| {
-///        row.iter().for_each(|cell|{
+///        row.iter().for_each(|cell| {
 ///            match cell {
 ///                CSVType::Int(val) => print!("INT:{:?},", val),
 ///                CSVType::Float(val) => print!("FLOAT:{:?},", val),

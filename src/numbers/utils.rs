@@ -2,7 +2,7 @@ use crate::{types::{Byte, ByteString}, CSVType};
 
 impl<'slice> Byte<'slice> {
     pub fn num_match(&self) -> CSVType {
-        let t = String::from_utf8_lossy(&self.b);
+        let t = String::from_utf8_lossy(&self.byte);
         let s = t.replace(|c: char| !c.is_ascii(), "");
         match s.trim().parse::<i64>() {
             Ok(v) => CSVType::Int(v),
@@ -14,14 +14,14 @@ impl<'slice> Byte<'slice> {
     }
 
     pub fn catch(&self) -> CSVType {
-        match_catch(&self.b)
+        match_catch(&self.byte)
     }
 }
 
 pub fn match_catch(bytes: &[u8]) -> CSVType {
     let t = String::from_utf8_lossy(&bytes);
     let s = t.replace(|c: char| !c.is_ascii(), "");
-    let bytestring = ByteString {s};
+    let bytestring = ByteString {bytestring: s};
 
     match bytestring {
         bs if bs.is_empty() => return CSVType::Empty,
