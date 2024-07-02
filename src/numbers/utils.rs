@@ -25,38 +25,41 @@ pub fn match_catch(bytes: &[u8]) -> CSVType {
 
     match bytestring {
         bs if bs.is_empty() => return CSVType::Empty,
-        bs if !bs.contains_number()
-        => return bs.convert_to_string(),
-        bs if bs.trimmed().chars().all(char::is_numeric)
-        => match bs {
+        bs if !bs.contains_number() => return bs.convert_to_string(),
+        bs if bs.trimmed().chars().all(char::is_numeric) => match bs {
             // checks for negative percent
             bs if bs.is_percent_neg()
             => match bs.remove_symbol().parse::<f64>() {
-                Ok(v) => return CSVType::Float(v),
+                Ok(val) => {
+                    let res = val / 100.0;
+                    return CSVType::Float(res)
+                },
                 Err(_) => return bs.convert_to_string(),
             },
             // checks for positive percent
             bs if bs.is_percent_pos()
             => match bs.remove_symbol().parse::<f64>() {
-                Ok(v) => return CSVType::Float(v),
+                Ok(val) => {
+                    let res = val / 100.0;
+                    return CSVType::Float(res)
+                },
                 Err(_) => return bs.convert_to_string(),
             },
             // checks for negative currency
             bs if bs.is_currency_neg()
             => match bs.remove_symbol().parse::<f64>() {
-                Ok(v) => return CSVType::Float(v),
+                Ok(val) => return CSVType::Float(val),
                 Err(_) => return bs.convert_to_string(),
             },
             // checks for positive currency 
             bs if bs.is_currency_pos()
             => match bs.remove_symbol().parse::<f64>() {
-                Ok(v) => return CSVType::Float(v),
+                Ok(val) => return CSVType::Float(val),
                 Err(_) => return bs.convert_to_string(),
             },
             _ => return bs.convert_to_string(),
         },
-        bs if bs.contains_number()
-        => match bs {
+        bs if bs.contains_number() => match bs {
             bs if bs.is_date_w_abbrv() => return bs.date_w_abbrv_match(),
             _ => return bs.convert_to_string(),
         },

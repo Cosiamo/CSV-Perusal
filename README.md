@@ -2,9 +2,9 @@
 
 A cargo crate that reads CSV files and returns the contents of the file with the appropriate datatype. Inspired by [Calamine](https://github.com/tafia/calamine/tree/master), this package aims to make dealing with CSV files easier. 
 
-CSV Perusal is built with uploading values from CSV files into relational databases in mind. The value returned when opening a CSV file is a two-dimensional vector of the `CSVType` enumerator, with each inner vector acting as a different row.
+CSV Perusal is built with uploading values from CSV files into relational databases in mind. The value returned when opening a CSV file is a two-dimensional vector of the [`CSVType`](https://docs.rs/csv_perusal/0.8.1/csv_perusal/enum.CSVType.html) enumerator, with each inner vector acting as a different row.
 
-CSV Perusal is very simple and easy to use. If you have a file path and just want the values parsed, `open_csv()` is what you're looking for. If you have a particular way you want to open a CSV file with the [`csv`](https://docs.rs/csv/latest/csv/) crate and have a vector of [`ByteRecords`](https://docs.rs/csv/latest/csv/struct.ByteRecord.html), or have a two-dimensional vector of a `String` or `&str`, then you'll want to use the method `get_csv_types()`.
+CSV Perusal is very simple and easy to use. If you have a file path and just want the values parsed, [`open_csv()`](https://docs.rs/csv_perusal/0.8.1/csv_perusal/fn.open_csv.html) is what you're looking for. If you have a particular way you want to open a CSV file with the [`csv`](https://docs.rs/csv/latest/csv/) crate and have a vector of [`ByteRecords`](https://docs.rs/csv/latest/csv/struct.ByteRecord.html), or have a two-dimensional vector of a `String` or `&str`, then you'll want to use the method [`get_csv_types()`](https://docs.rs/csv_perusal/0.8.1/csv_perusal/trait.ParseSeparatedValues.html#tymethod.get_csv_types).
 
 ## Example
 
@@ -47,10 +47,10 @@ fn main() {
 ```
 STRING: "id", STRING: "Money", STRING: "Percent", STRING: "Date", STRING: "DateTime", STRING: "Time12h", STRING: "Time24h",
 -----------------------------
-INT: 1, FLOAT: 8.7, FLOAT: 34.1, DATE: "2023-05-28", DATETIME: "2023-10-25 19:48:00", TIME: "17:31:00", TIME: "23:02:00",
-INT: 2, FLOAT: 6.08, FLOAT: 90.1, DATE: "2023-02-07", DATETIME: "2023-11-04 01:58:00", TIME: "06:47:00", TIME: "14:11:00",
-INT: 3, FLOAT: 6.44, FLOAT: 50.1, DATE: "2023-07-24", DATETIME: "2023-07-04 01:04:00", TIME: "12:32:00", TIME: "17:27:00",
-INT: 4, FLOAT: 4.99, FLOAT: 15.6, DATE: "2022-12-29", DATETIME: "2023-12-04 11:34:00", TIME: "17:17:00", TIME: "04:53:00",
+INT: 1, FLOAT: 8.7, FLOAT: 0.341, DATE: "2023-05-28", DATETIME: "2023-10-25 19:48:00", TIME: "17:31:00", TIME: "23:02:00",
+INT: 2, FLOAT: 6.08, FLOAT: 0.901, DATE: "2023-02-07", DATETIME: "2023-11-04 01:58:00", TIME: "06:47:00", TIME: "14:11:00",
+INT: 3, FLOAT: 6.44, FLOAT: 0.501, DATE: "2023-07-24", DATETIME: "2023-07-04 01:04:00", TIME: "12:32:00", TIME: "17:27:00",
+INT: 4, FLOAT: 4.99, FLOAT: 0.156, DATE: "2022-12-29", DATETIME: "2023-12-04 11:34:00", TIME: "17:17:00", TIME: "04:53:00",
 ```
 
 
