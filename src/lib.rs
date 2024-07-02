@@ -81,13 +81,13 @@ pub trait ParseSeparatedValues {
     /// 
     /// # How to Implement
     /// 
+    /// [`grid_to_byterecord`] will convert your grid data into Vec<[`csv::ByteRecord`]>.
+    /// [`assign_bytes`] converts Vec<[`csv::ByteRecord`]> to Vec<Vec<[`CSVType`]>>.
     /// ```rust 
     /// impl ParseSeparatedValues for Vec<Vec<MyCustomEnum>> {
     ///     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     ///         // Make sure your input datatype can convert to a string.
-    ///         // [`utils::grid_to_byterecord!`] will convert your grid data into Vec<[`csv::ByteRecord`]>.
     ///         let byte_records = grid_to_byterecord!(self);
-    ///         // Converts Vec<[`csv::ByteRecord`]> to Vec<Vec<[`CSVType`]>>
     ///         assign_bytes(byte_records)
     ///     }
     /// }
