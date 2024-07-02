@@ -3,9 +3,10 @@ use memchr::memmem::Finder;
 
 impl<'slice> Byte<'slice> {
     pub fn is_dt(&self) -> bool {
-        Finder::new("/").find(&self.b).is_some()
-        || Finder::new("-").find(&self.b).is_some()
-        || Finder::new(":").find(&self.b).is_some()
+        let haystack = &self.b;
+        Finder::new("/").find(haystack).is_some()
+        || Finder::new("-").find(haystack).is_some()
+        || Finder::new(":").find(haystack).is_some()
     }
 
     pub fn date_and_time(&self) -> CSVType {
@@ -19,7 +20,8 @@ impl<'slice> Byte<'slice> {
     }
 
     pub fn am_pm(&self) -> bool {
-        Finder::new("AM").find(&self.b.to_ascii_uppercase()).is_some()
-        || Finder::new("PM").find(&self.b.to_ascii_uppercase()).is_some()
+        let haystack = &self.b.to_ascii_uppercase();
+        Finder::new("AM").find(haystack).is_some()
+        || Finder::new("PM").find(haystack).is_some()
     }
 }
