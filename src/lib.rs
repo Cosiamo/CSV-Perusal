@@ -3,12 +3,16 @@
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Serialize, Deserialize};
 use csv::{ByteRecord, ReaderBuilder};
-use open::{assign_bytes, csv_read};
+use open::csv_read;
 use errors::{CSVPerusalError, CellError};
+use utils::assign_bytes;
 use core::fmt;
 
+/// Used to store custom errors.
 pub mod errors;
+/// Contains misc. tools that are useful for implementing [`ParseSeparatedValues`].
 pub mod utils;
+/// Opens CSV files.
 pub mod open;
 pub(crate) mod dates;
 pub(crate) mod regex;
@@ -17,7 +21,9 @@ pub(crate) mod types;
 
 /// `CSVType` is the organized the data from [`csv::ByteRecord`]. 
 /// It's meant to make the generic output data from the [`csv`] package easier to work with by giving each cell a specific data type. 
+/// 
 /// Date, Time, and DateTime use [`chrono`]'s [`chrono::NaiveDate`], [`chrono::NaiveTime`], and [`chrono::NaiveDateTime`] respectively.
+/// [`serde::Serialize`] and [`serde::Deserialize`] are implemented, making it much easier to send this enum via json.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum CSVType {
     Int(i64),

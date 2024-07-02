@@ -10,7 +10,7 @@ pub enum CSVPerusalError {
     IOError(std::io::Error),
 }
 
-// Error from parsing a value from a CSV file.
+/// Error from parsing a value from a CSV file.
 #[derive(Error, Debug, Serialize, Deserialize, Clone, PartialEq, PartialOrd)]
 pub enum CellError {
     #[error("A cell could not be parsed into an int, float, date, or string")]
