@@ -1,7 +1,7 @@
 [package]
 name = "csv_perusal"
-version = "0.8.2"
-edition = "2021"
+version = "0.9.0"
+edition = "2024"
 license = "Apache-2.0"
 description = "Reads CSV files and returns the contents of the file with the appropriate datatype."
 readme = "README.md"

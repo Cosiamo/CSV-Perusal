@@ -48,7 +48,7 @@ pub fn assign_bytes(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVP
 /// This creates a tab-separated-value grid that is be used to build a vector of [`csv::ByteRecord`].
 #[macro_export]
 macro_rules! grid_to_byterecord {
-    ($data:expr) => {{
+    ($data:expr_2021) => {{
         let tabbed = $data.iter().map(|row| row.join("\t")).collect::<Vec<String>>();
         let tsv = tabbed.join("\n");
         let mut reader = ReaderBuilder::new().delimiter(b'\t').from_reader(tsv.as_bytes());
