@@ -11,17 +11,15 @@ impl<'slice> Byte<'slice> {
 
     pub fn date_and_time(&self) -> CSVType {
         let bytestring = ByteString {bytestring: String::from_utf8_lossy(&self.byte).replace(|c: char| !c.is_ascii(), "")};
-        match self {
-            by if by.is_time_24h() || by.is_time_12h() => return bytestring.time_match(),
-            by if by.is_datetime() => return bytestring.datetime_match(),
-            by if by.is_date() => return bytestring.date_match(),
-            _ => return self.catch(),
-        }
-    }
 
-    pub fn am_pm(&self) -> bool {
-        let haystack = &self.byte.to_ascii_uppercase();
-        Finder::new("AM").find(haystack).is_some()
-        || Finder::new("PM").find(haystack).is_some()
+        if let Some(time) = bytestring.time_match() {
+            return time;
+        } else if let Some(datetime) = bytestring.datetime_match() {
+            return datetime
+        } else if let Some(date) = bytestring.date_match() {
+            return date
+        } else {
+            return self.catch()
+        }
     }
 }
