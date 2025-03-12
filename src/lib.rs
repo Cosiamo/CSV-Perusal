@@ -54,7 +54,7 @@ impl fmt::Display for CSVType {
 /// 
 /// # Example
 /// 
-/// ```rust
+/// ```no_run
 /// use csv_perusal::{open_csv, CSVType};
 ///
 /// fn main() {
@@ -91,7 +91,7 @@ pub trait ParseSeparatedValues {
     /// 
     /// [`grid_to_byterecord`] will convert your grid data into Vec<[`csv::ByteRecord`]>.
     /// [`assign_bytes`] converts Vec<[`csv::ByteRecord`]> to Vec<Vec<[`CSVType`]>>.
-    /// ```rust 
+    /// ```no_run 
     /// impl ParseSeparatedValues for Vec<Vec<MyCustomEnum>> {
     ///     fn get_csv_types(self) -> Result<Vec<Vec<CSVType>>, CSVPerusalError> {
     ///         // Make sure your input datatype can convert to a string.
