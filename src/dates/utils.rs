@@ -1,22 +1,22 @@
-use crate::{types::{Byte, ByteString}, CSVType};
+use crate::{types::{Bytes, ByteString}, CSVType};
 use memchr::memmem::Finder;
 
-impl<'slice> Byte<'slice> {
+impl<'slice> Bytes<'slice> {
     pub fn is_dt(&self) -> bool {
-        let haystack = &self.byte;
+        let haystack = &self.bytes;
         Finder::new("/").find(haystack).is_some()
         || Finder::new("-").find(haystack).is_some()
         || Finder::new(":").find(haystack).is_some()
     }
+}
 
+impl ByteString {
     pub fn date_and_time(&self) -> CSVType {
-        let bytestring = ByteString {bytestring: String::from_utf8_lossy(&self.byte).replace(|c: char| !c.is_ascii(), "")};
-
-        if let Some(time) = bytestring.time_match() {
+        if let Some(time) = self.time_match() {
             return time;
-        } else if let Some(datetime) = bytestring.datetime_match() {
+        } else if let Some(datetime) = self.datetime_match() {
             return datetime
-        } else if let Some(date) = bytestring.date_match() {
+        } else if let Some(date) = self.date_match() {
             return date
         } else {
             return self.catch()

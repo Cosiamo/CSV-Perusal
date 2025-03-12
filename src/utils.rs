@@ -1,4 +1,4 @@
-use crate::{errors::CSVPerusalError, numbers::utils::match_catch, types::Byte, CSVType};
+use crate::{errors::CSVPerusalError, types::{ByteString, Bytes}, CSVType};
 use csv::ByteRecord;
 use rayon::prelude::*;
 use std::sync::mpsc::channel;
@@ -15,11 +15,15 @@ pub fn assign_bytes(mut data: Vec<ByteRecord>) -> Result<Vec<Vec<CSVType>>, CSVP
             match bytes {
                 [] => inner_vec.push(CSVType::Empty),
                 _ => {
-                    let byte: Byte<'_> = Byte{byte: bytes};
+                    let cow = String::from_utf8_lossy(&bytes);
+                    let string = cow.replace(|c: char| !c.is_ascii(), "");
+                    let bytestring = ByteString {bytestring: string};
+                    
+                    let byte: Bytes<'_> = Bytes{bytes};
                     match byte {
-                        byte if byte.is_number() => inner_vec.push(byte.num_match()),
-                        byte if byte.is_dt()=> inner_vec.push(byte.date_and_time()),
-                        _ => inner_vec.push(match_catch(bytes)),
+                        byte if byte.is_number() => inner_vec.push(bytestring.num_match()),
+                        byte if byte.is_dt()=> inner_vec.push(bytestring.date_and_time()),
+                        _ => inner_vec.push(bytestring.catch()),
                     }
                 }
             }

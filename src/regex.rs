@@ -1,16 +1,16 @@
 use regex::bytes::Regex;
 use once_cell::sync::Lazy;
 
-use crate::types::{Byte, ByteString};
+use crate::types::{Bytes, ByteString};
 
 // is_number
 static NUM: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[-+]?\d*\.?\d*(\d+[eE][-+]?)?\d+$").unwrap()
 });
 
-impl<'slice> Byte<'slice> {
+impl<'slice> Bytes<'slice> {
     pub fn is_number(&self) -> bool {
-        NUM.captures(&self.byte).is_some()
+        NUM.captures(&self.bytes).is_some()
     }
 }
 
