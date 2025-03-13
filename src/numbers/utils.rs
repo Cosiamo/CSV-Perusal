@@ -12,47 +12,38 @@ impl ByteString {
     }
 
     pub fn catch(&self) -> CSVType {
-        match self {
-            bs if bs.is_empty() => return CSVType::Empty,
-            bs if !bs.contains_number() => return bs.convert_to_string(),
-            bs if bs.trimmed().chars().all(char::is_numeric) => match bs {
-                // checks for negative percent
-                bs if bs.is_percent_neg()
-                => match bs.remove_symbol().parse::<f64>() {
-                    Ok(val) => {
-                        let res = val / 100.0;
-                        return CSVType::Float(res)
-                    },
-                    Err(_) => return bs.convert_to_string(),
-                },
-                // checks for positive percent
-                bs if bs.is_percent_pos()
-                => match bs.remove_symbol().parse::<f64>() {
-                    Ok(val) => {
-                        let res = val / 100.0;
-                        return CSVType::Float(res)
-                    },
-                    Err(_) => return bs.convert_to_string(),
-                },
-                // checks for negative currency
-                bs if bs.is_currency_neg()
-                => match bs.remove_symbol().parse::<f64>() {
-                    Ok(val) => return CSVType::Float(val),
-                    Err(_) => return bs.convert_to_string(),
-                },
-                // checks for positive currency 
-                bs if bs.is_currency_pos()
-                => match bs.remove_symbol().parse::<f64>() {
-                    Ok(val) => return CSVType::Float(val),
-                    Err(_) => return bs.convert_to_string(),
-                },
-                _ => return bs.convert_to_string(),
-            },
-            bs if bs.contains_number() => match bs {
-                bs if bs.is_date_w_abbrv() => return bs.date_w_abbrv_match(),
-                _ => return bs.convert_to_string(),
-            },
-            _ => return self.convert_to_string(),
+        if self.is_empty() {
+            return CSVType::Empty
         }
+        if !self.contains_number() {
+            return self.convert_to_string()
+        }
+        if self.is_numeric_with_symbols() && self.is_percentage() {
+            if let Ok(val) = self.remove_symbol().parse::<f64>() {
+                let res = val / 100.0;
+                return CSVType::Float(res)
+            }
+        }
+        if self.is_numeric_with_symbols() && self.is_currency() {
+            if let Ok(val) = self.remove_symbol().parse::<f64>() {
+                return CSVType::Float(val)
+            }
+        }
+        if self.contains_number() && self.is_date_w_abbrv() {
+            return self.date_w_abbrv_match()
+        }
+        return self.convert_to_string()
+    }
+
+    pub fn is_numeric_with_symbols(&self) -> bool {
+        self.trimmed().chars().all(char::is_numeric)
+    }
+
+    pub fn is_percentage(&self) -> bool {
+        self.is_percent_pos() || self.is_percent_neg()
+    }
+
+    pub fn is_currency(&self) -> bool {
+        self.is_currency_pos() || self.is_currency_neg()
     }
 }
